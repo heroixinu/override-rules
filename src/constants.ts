@@ -26,6 +26,8 @@ export const PROXY_GROUPS = {
     MICROSOFT: "微软服务",
     STEAM_DOWNLOAD: "Steam下载代理",
     STEAM_OVERSEAS: "Steam境外",
+    PT_BT_TRACKER: "PT/BT/Tracker",
+    VOWIFI: "VoWiFi/WiFi Calling",
     BILIBILI: "哔哩哔哩",
     BAHAMUT: "巴哈姆特",
     XBOX: "Xbox",
