@@ -58,6 +58,14 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/SteamFix.list`,
         path: "./ruleset/SteamFix.list",
     },
+    VoWiFi: {
+        type: "http",
+        behavior: "classical",
+        format: "text",
+        interval: 86400,
+        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/VoWiFi.list`,
+        path: "./ruleset/VoWiFi.list",
+    },
     GoogleFCM: {
         type: "http",
         behavior: "classical",
