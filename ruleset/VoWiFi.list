@@ -1,0 +1,3 @@
+# Wi-Fi Calling / VoWiFi ePDG endpoints.
+# Covers both 3GPP-standard ePDG FQDNs and carrier-owned ePDG hostnames.
+DOMAIN-KEYWORD,epdg
