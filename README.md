@@ -95,6 +95,28 @@ https://raw.githubusercontent.com/powerfullz/override-rules/refs/heads/preview/c
 
 ### 关于部分特殊代理组的说明
 
+#### 当前中国直连与策略组映射
+
+当前规则针对中国用户采用「特殊场景优先 → 中国域名优先直连 → 其余静态/CDN 与海外服务再进入策略组」的顺序。中国基础流量不额外创建策略组，只有确实存在手动切换出口需求的场景才保留独立策略组。
+
+| 策略组 / 行为 | 实际匹配规则 | 说明 |
+| --- | --- | --- |
+| **中国域名直连** | `GEOSITE,google@cn`、`GEOSITE,apple@cn`、`GEOSITE,microsoft@cn`、`GEOSITE,cn` | 全部直接 `DIRECT`，不显示为可选策略组；中国域名和中国 CDN 优先于通用静态资源规则。 |
+| **中国 IP 直连** | `GEOIP,cn` | 作为域名规则之后的 IP 层兜底，直接 `DIRECT`。 |
+| **Steam下载代理** | `RULE-SET,SteamFix` + `GEOSITE,steam@cn` | 优先级高于中国直连层，默认直连，也可以手动切换代理或地区节点。 |
+| **PT/BT/Tracker** | `GEOSITE,category-pt` + `GEOSITE,category-public-tracker` | 私有 PT 站点与公共 Tracker 统一进入该策略组，默认直连，可按需要切换出口。 |
+| **VoWiFi/WiFi Calling** | `RULE-SET,VoWiFi` | 当前主要匹配 ePDG 域名，默认直连，可针对运营商网络情况手动切换出口。 |
+| **静态资源** | `RULE-SET,StaticResources` + `RULE-SET,CDNResources` + `RULE-SET,AdditionalCDNResources` | 在中国直连层之后匹配，因此国内 CDN 优先直连；剩余 Cloudflare、Akamai、Fastly 等海外 CDN / 静态资源进入该策略组。 |
+| **苹果服务** | `GEOSITE,apple` | `apple@cn` 已提前直连，剩余 Apple 流量进入该组。 |
+| **谷歌服务** | `GEOSITE,google` | `google@cn` 已提前直连，剩余 Google 流量进入该组。 |
+| **微软服务** | `GEOSITE,microsoft` | `microsoft@cn` 已提前直连，剩余 Microsoft 流量进入该组。 |
+| **Telegram** | `GEOSITE,telegram` + `GEOIP,telegram` | 同时覆盖域名和直接 IP 连接。 |
+| **Netflix** | `GEOSITE,netflix` + `GEOIP,netflix` | 同时覆盖域名和直接 IP 连接。 |
+| **选择代理** | `GEOSITE,steam`（未被 `steam@cn` 命中的部分）+ `RULE-SET,GFWList` | Steam 其余流量及 GFWList 命中流量进入通用代理选择。 |
+| **Final** | `MATCH` | 前述规则均未命中的最终兜底流量。 |
+
+简化后的核心逻辑可以理解为：**明确属于中国大陆的域名 / CDN 直接连接；剩余海外静态资源才进入「静态资源」组；Steam 下载、PT/BT/Tracker、VoWiFi 等特殊场景保留独立的手动出口控制。**
+
 **静态资源**：包含所有常见静态资源 CDN 域名、对象存储域名。大部分网站的静态资源（如图片、视频、音频、字体、JS、CSS）都有独立域名、不设置风控措施、不设置鉴权，这些静态资源可以使用 IP 不一定干净（例如 IDC 类 IP）、但是带宽更大、延时更低、而且有和大部分主流 CDN（如 Cloudflare、Akamai、Fastly、EdgeCast）在 IXP 有互联的网络出口。一般就实践经验来看，在正常上网中这部分域名产生的流量占据约 70% 左右。如果你在使用商业性质的远端策略服务提供商、且该服务上提供了低倍率节点，你可以将这部分域名分流至低倍率节点以节省流量。[^fn1]
 
 [^fn1]: 来源：[我有特别的 Surge 配置和使用技巧](https://blog.skk.moe/post/i-have-my-unique-surge-setup/)
