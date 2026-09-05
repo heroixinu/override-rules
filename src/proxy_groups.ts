@@ -163,6 +163,18 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.PT_BT_TRACKER,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Proxy.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
+            name: PROXY_GROUPS.VOWIFI,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Available_1.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
             name: PROXY_GROUPS.XBOX,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Xbox.png`,
             type: "select",
