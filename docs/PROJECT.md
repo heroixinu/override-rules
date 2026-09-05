@@ -160,13 +160,13 @@ proxies:
 - `preview`：由 `main` 变更自动构建并强制更新，适合测试当前最新规则。
 - 正式版本：通过 `src-vX.Y.Z` 源码 Tag 触发 Release 工作流，并生成对应 GitHub Release 与版本产物。
 
-本 README 不依赖第三方 CDN 链接，避免文档链接与实际发布状态不一致。
+本文档不依赖第三方 CDN 链接，避免文档链接与实际发布状态不一致。
 
 ## 自定义与贡献
 
-- 自定义规则与策略组：[`docs/HOW_TO_CUSTOMISE.md`](docs/HOW_TO_CUSTOMISE.md)
-- 贡献指南：[`docs/HOW_TO_CONTRIBUTE.md`](docs/HOW_TO_CONTRIBUTE.md)
-- AI Agent 约定：[`AGENTS.md`](AGENTS.md)
+- 自定义规则与策略组：[`HOW_TO_CUSTOMISE.md`](HOW_TO_CUSTOMISE.md)
+- 贡献指南：[`HOW_TO_CONTRIBUTE.md`](HOW_TO_CONTRIBUTE.md)
+- AI Agent 约定：[`../AGENTS.md`](../AGENTS.md)
 
 ## 上游
 
