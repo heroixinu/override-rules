@@ -139,8 +139,26 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.MICROSOFT_CN,
+            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
             name: PROXY_GROUPS.MICROSOFT,
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
+            name: PROXY_GROUPS.STEAM_DOWNLOAD,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Steam.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
+            name: PROXY_GROUPS.STEAM_OVERSEAS,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Steam.png`,
             type: "select",
             proxies: defaultProxies,
         },
