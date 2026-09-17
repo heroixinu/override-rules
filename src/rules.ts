@@ -31,7 +31,6 @@ export function buildRules(
         `GEOSITE,category-public-tracker,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `RULE-SET,VoWiFi,${PROXY_GROUPS.VOWIFI}`,
         `DOMAIN-SUFFIX,mexc.fm,${MEXC_GROUP}`,
-        `GEOSITE,google@cn,DIRECT`,
         `GEOSITE,apple@cn,DIRECT`,
         `GEOSITE,microsoft@cn,DIRECT`,
         `GEOSITE,cn,DIRECT`,
