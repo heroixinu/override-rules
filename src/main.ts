@@ -35,6 +35,8 @@ import { buildTunConfig } from "./tun";
 import { buildBaseLists } from "./selectors";
 import type { ClashConfig, ScriptArgs } from "./types";
 
+const MEXC_GROUP = "MEXC";
+
 const geoxURL = {
     geoip: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geoip.dat`,
     geosite: `${CDN_URL}/gh/MetaCubeX/meta-rules-dat@release/geosite.dat`,
@@ -108,6 +110,13 @@ function main(config: ClashConfig): ClashConfig {
         defaultSelector,
         defaultFallback,
         frontProxySelector,
+    });
+
+    proxyGroups.push({
+        name: MEXC_GROUP,
+        icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Cryptocurrency_1.png`,
+        type: "select",
+        proxies: defaultProxies,
     });
 
     const globalProxies = proxyGroups.map((item) => String(item.name));

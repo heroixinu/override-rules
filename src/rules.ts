@@ -1,6 +1,8 @@
 import { PROXY_GROUPS } from "./constants";
 import { isNotNull } from "./utils";
 
+const MEXC_GROUP = "MEXC";
+
 /**
  * 构建最终的规则列表。
  *
@@ -28,6 +30,7 @@ export function buildRules(
         `GEOSITE,category-pt,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `GEOSITE,category-public-tracker,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `RULE-SET,VoWiFi,${PROXY_GROUPS.VOWIFI}`,
+        `DOMAIN-SUFFIX,mexc.fm,${MEXC_GROUP}`,
         `GEOSITE,google@cn,DIRECT`,
         `GEOSITE,apple@cn,DIRECT`,
         `GEOSITE,microsoft@cn,DIRECT`,
