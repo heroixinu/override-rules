@@ -16,7 +16,7 @@ export function buildRules(
     tailscale: boolean
 ): string[] {
     return [
-        quicEnabled ? `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` : null,
+        !quicEnabled ? `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` : null,
         tailscale ? `IP-CIDR,100.64.0.0/10,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `DOMAIN-SUFFIX,ts.net,${PROXY_GROUPS.TAILSCALE}` : null,
@@ -37,6 +37,8 @@ export function buildRules(
         `RULE-SET,StaticResources,${PROXY_GROUPS.STATIC_RESOURCES}`,
         `RULE-SET,CDNResources,${PROXY_GROUPS.STATIC_RESOURCES}`,
         `RULE-SET,AdditionalCDNResources,${PROXY_GROUPS.STATIC_RESOURCES}`,
+        `GEOSITE,category-cryptocurrency,${PROXY_GROUPS.CRYPTO}`,
+        `GEOSITE,category-finance,${PROXY_GROUPS.FINANCE}`,
         `GEOSITE,category-ai-!cn,${PROXY_GROUPS.AI_SERVICE}`,
         `GEOSITE,bilibili,${PROXY_GROUPS.BILIBILI}`,
         `GEOSITE,youtube,${PROXY_GROUPS.YOUTUBE}`,
@@ -59,7 +61,6 @@ export function buildRules(
         `GEOSITE,apple,${PROXY_GROUPS.APPLE}`,
         `GEOSITE,microsoft,${PROXY_GROUPS.MICROSOFT}`,
         `GEOSITE,google,${PROXY_GROUPS.GOOGLE}`,
-        `RULE-SET,Crypto,${PROXY_GROUPS.CRYPTO}`,
         `RULE-SET,GFWList,${PROXY_GROUPS.SELECT}`,
         `GEOIP,cn,DIRECT`,
         `MATCH,${PROXY_GROUPS.FINAL}`,
