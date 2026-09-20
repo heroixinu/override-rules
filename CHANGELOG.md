@@ -1,5 +1,69 @@
 # Changelog
 
+## [2.7.6](https://github.com/powerfullz/override-rules/compare/src-v2.7.5...src-v2.7.6) (2026-09-16)
+
+
+### Bug Fixes
+
+- 升级 brace-expansion 至 5.0.12 修复高危 DoS 告警 ([ba5d324](https://github.com/powerfullz/override-rules/commit/ba5d32433da3746ec75d6fbe404c123efc251242))
+## [2.7.5](https://github.com/powerfullz/override-rules/compare/src-v2.7.4...src-v2.7.5) (2026-09-16)
+
+
+### Build
+
+- 恢复 TypeScript 7 类型检查工具链与 TS lint 覆盖 ([5d12e06](https://github.com/powerfullz/override-rules/commit/5d12e064988de66329db4fd232ebc1309825ca79))
+
+
+### CI
+
+- 修复 release/preview 调用已删除的 typecheck 脚本 ([2db0c1c](https://github.com/powerfullz/override-rules/commit/2db0c1cf8c898aff3ff13ac00c68cf419c4be5ba))
+
+
+### Documentation
+
+- 说明双 TypeScript 版本设计与 typecheck 工作流 ([17816dc](https://github.com/powerfullz/override-rules/commit/17816dc2313b3a576cb58712bee2a37fb6d959bd))
+
+
+### Features
+
+- 添加金融服务代理组 ([fa263d8](https://github.com/powerfullz/override-rules/commit/fa263d89a73a03f5b96ba1e19bf4c1e441b79550))
+
+
+### Other
+
+- Agent Host changes for agents/update-architecture-doc (#69) ([9964641](https://github.com/powerfullz/override-rules/commit/996464115236585d946455d95153197ebc478455))
+- Update package-lock.json and package.json for TypeScript 7 migration ([bada7d2](https://github.com/powerfullz/override-rules/commit/bada7d2955b9ad14e30556f60a82d684bd759041))
+- Refactor CI workflow and update documentation for TypeScript 7 migration
+
+- Adjust CI configuration in ci.yaml
+- Update HOW_TO_CUSTOMISE.md for clarity
+- Refine eslint.config.mjs to improve linting rules
+- Optimize package-lock.json and package.json for dependencies ([9abb81a](https://github.com/powerfullz/override-rules/commit/9abb81a06d884a3566b5382674584959b5c8a249))
+- Agent Host changes for agents/typescript-7-migration-and-dependencies ([d0eadd9](https://github.com/powerfullz/override-rules/commit/d0eadd9dedeabfe992f13ae9b5353436afbfee6a))
+## [2.7.4](https://github.com/powerfullz/override-rules/compare/src-v2.7.3...src-v2.7.4) (2026-09-09)
+
+
+### Other
+
+- Quic 参数的逻辑写反了
+Fixes #66 ([c149a40](https://github.com/powerfullz/override-rules/commit/c149a400b33b4fe14cef9764bea1f53ff167a4e7))
+## [2.7.3](https://github.com/powerfullz/override-rules/compare/src-v2.7.2...src-v2.7.3) (2026-09-08)
+
+
+### Bug Fixes
+
+- 删除多余的proxy-server-nameserver ([9c29203](https://github.com/powerfullz/override-rules/commit/9c292033ed82ace9b209253ca8b51a1005ec94f1))
+- 仅合并必要的字段 ([85ede6f](https://github.com/powerfullz/override-rules/commit/85ede6fe10c2f1659d0852e0e07a22d4c53249b7))
+
+
+### Chores
+
+- Update dependencies ([2ec6f64](https://github.com/powerfullz/override-rules/commit/2ec6f645198e824885ab2aee4b94eafc8d4d19d1))
+
+
+### Other
+
+- Update readme ([b503979](https://github.com/powerfullz/override-rules/commit/b5039799646aedbcb53fac1323c8f852da536b93))
 ## [2.7.2](https://github.com/powerfullz/override-rules/compare/src-v2.7.1...src-v2.7.2) (2026-08-21)
 
 
