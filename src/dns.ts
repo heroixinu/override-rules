@@ -194,7 +194,7 @@ function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput
     const config: DnsConfig = {
         enable: true,
         ipv6: ipv6Enabled,
-        "prefer-h3": true,
+        "prefer-h3": false,
         "enhanced-mode": mode,
         nameserver: ["system", "223.5.5.5", "119.29.29.29", "180.184.1.1"],
         fallback: [
