@@ -138,6 +138,14 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/VoWiFi.list`,
         path: "./ruleset/VoWiFi.list",
     },
+    VoWiFiCarriers: {
+        type: "http",
+        behavior: "classical",
+        format: "text",
+        interval: 86400,
+        url: "https://raw.githubusercontent.com/CMJ781/Loon/main/vowifi-country-rules.yaml",
+        path: "./ruleset/VoWiFiCarriers.list",
+    },
     GoogleFCM: {
         type: "http",
         behavior: "classical",
