@@ -120,6 +120,12 @@ export function buildProxyGroups({
             proxies: defaultProxiesDirect,
         },
         {
+            name: PROXY_GROUPS.REGION_DETECTION,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Area.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
             name: PROXY_GROUPS.DEVELOPER,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/GitHub.png`,
             type: "select",
