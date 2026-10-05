@@ -36,8 +36,7 @@ export function buildRules(
         `GEOSITE,category-pt,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `GEOSITE,category-public-tracker,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `RULE-SET,VoWiFi,${PROXY_GROUPS.VOWIFI}`,
-        // Raw-IP fallback for IKE/IPsec NAT-T used by German VoWiFi gateways (e.g. O2 DE).
-        `AND,((GEOIP,DE),(AND,((NETWORK,UDP),(DST-PORT,500/4500)))),${PROXY_GROUPS.VOWIFI}`,
+        `RULE-SET,VoWiFiCarriers,${PROXY_GROUPS.VOWIFI}`,
         `RULE-SET,Game,${PROXY_GROUPS.GAME_SERVICE}`,
         `GEOSITE,apple@cn,DIRECT`,
         `GEOSITE,microsoft@cn,DIRECT`,
