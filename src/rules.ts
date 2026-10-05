@@ -7,16 +7,15 @@ const MEXC_GROUP = "MEXC";
  * 构建最终的规则列表。
  *
  * @param {Object} params - 构建参数
- * @param {boolean} params.quicEnabled - 是否启用 QUIC（如未启用会插入 UDP:443 拦截规则）
+ * @param {boolean} params.quicEnabled - 是否启用 QUIC（保留参数兼容现有调用；不再生成全局 UDP/443 拦截规则）
  * @param {boolean} tailscale - 是否有 Tailscale 节点
  * @returns {string[]} 规则字符串数组
  */
 export function buildRules(
-    { quicEnabled }: { quicEnabled: boolean },
+    { quicEnabled: _quicEnabled }: { quicEnabled: boolean },
     tailscale: boolean
 ): string[] {
     return [
-        !quicEnabled ? `AND,((DST-PORT,443),(NETWORK,UDP)),REJECT` : null,
         tailscale ? `IP-CIDR,100.64.0.0/10,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `DOMAIN-SUFFIX,ts.net,${PROXY_GROUPS.TAILSCALE}` : null,
