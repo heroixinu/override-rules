@@ -42,14 +42,6 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/TikTok.list`,
         path: "./ruleset/TikTok.list",
     },
-    EHentai: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/EHentai.list`,
-        path: "./ruleset/EHentai.list",
-    },
     SteamFix: {
         type: "http",
         behavior: "classical",

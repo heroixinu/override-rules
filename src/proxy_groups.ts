@@ -77,7 +77,6 @@ export function buildProxyGroups({
 }: BuildProxyGroupsInput): ProxyGroup[] {
     const hasTW = countryNames.includes("台湾");
     const hasHK = countryNames.includes("香港");
-    const hasUS = countryNames.includes("美国");
     const hasTailscale = tailscaleNodes.length > 0;
     const groups: Array<ProxyGroup | null> = [
         {
@@ -187,22 +186,8 @@ export function buildProxyGroups({
             proxies: hasTW && hasHK ? ["DIRECT", `台湾节点`, `香港节点`] : defaultProxiesDirect,
         },
         {
-            name: PROXY_GROUPS.BAHAMUT,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Bahamut.png`,
-            type: "select",
-            proxies: hasTW
-                ? [`台湾节点`, PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL, "DIRECT"]
-                : defaultProxies,
-        },
-        {
             name: PROXY_GROUPS.YOUTUBE,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/YouTube.png`,
-            type: "select",
-            proxies: defaultProxies,
-        },
-        {
-            name: PROXY_GROUPS.TWITCH,
-            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Twitch.png`,
             type: "select",
             proxies: defaultProxies,
         },
@@ -242,20 +227,6 @@ export function buildProxyGroups({
             type: "select",
             "include-all": true,
             proxies: defaultProxiesDirect,
-        },
-        {
-            name: PROXY_GROUPS.TRUTH_SOCIAL,
-            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Truth_Social.png`,
-            type: "select",
-            proxies: hasUS
-                ? [`美国节点`, PROXY_GROUPS.SELECT, PROXY_GROUPS.MANUAL]
-                : defaultProxies,
-        },
-        {
-            name: PROXY_GROUPS.EHENTAI,
-            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Ehentai.png`,
-            type: "select",
-            proxies: defaultProxies,
         },
         {
             name: PROXY_GROUPS.PIKPAK,

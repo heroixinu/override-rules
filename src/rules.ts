@@ -1,8 +1,6 @@
 import { PROXY_GROUPS } from "./constants";
 import { isNotNull } from "./utils";
 
-const MEXC_GROUP = "MEXC";
-
 /**
  * 构建最终的规则列表。
  *
@@ -23,13 +21,11 @@ export function buildRules(
         `RULE-SET,ADBlock,${PROXY_GROUPS.AD_BLOCK}`,
         `RULE-SET,AdditionalFilter,${PROXY_GROUPS.AD_BLOCK}`,
         `RULE-SET,SogouInput,${PROXY_GROUPS.SOGOU_INPUT}`,
-        `DOMAIN-SUFFIX,truthsocial.com,${PROXY_GROUPS.TRUTH_SOCIAL}`,
         `RULE-SET,SteamFix,${PROXY_GROUPS.STEAM_DOWNLOAD}`,
         `GEOSITE,steam@cn,${PROXY_GROUPS.STEAM_DOWNLOAD}`,
         `GEOSITE,category-pt,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `GEOSITE,category-public-tracker,${PROXY_GROUPS.PT_BT_TRACKER}`,
         `RULE-SET,VoWiFi,${PROXY_GROUPS.VOWIFI}`,
-        `DOMAIN-SUFFIX,mexc.fm,${MEXC_GROUP}`,
         `GEOSITE,apple@cn,DIRECT`,
         `GEOSITE,microsoft@cn,DIRECT`,
         `GEOSITE,cn,DIRECT`,
@@ -46,14 +42,11 @@ export function buildRules(
         `GEOSITE,xbox,${PROXY_GROUPS.XBOX}`,
         `GEOSITE,github,${PROXY_GROUPS.GITHUB}`,
         `GEOSITE,netflix,${PROXY_GROUPS.NETFLIX}`,
-        `GEOSITE,twitch,${PROXY_GROUPS.TWITCH}`,
         `GEOIP,netflix,${PROXY_GROUPS.NETFLIX},no-resolve`,
         `GEOSITE,spotify,${PROXY_GROUPS.SPOTIFY}`,
-        `GEOSITE,bahamut,${PROXY_GROUPS.BAHAMUT}`,
         `GEOSITE,pikpak,${PROXY_GROUPS.PIKPAK}`,
         `GEOSITE,twitter,${PROXY_GROUPS.TWITTER}`,
         `RULE-SET,Weibo,${PROXY_GROUPS.WEIBO}`,
-        `RULE-SET,EHentai,${PROXY_GROUPS.EHENTAI}`,
         `RULE-SET,TikTok,${PROXY_GROUPS.TIKTOK}`,
         `GEOSITE,steam,${PROXY_GROUPS.SELECT}`,
         `RULE-SET,GoogleFCM,DIRECT`,
