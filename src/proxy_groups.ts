@@ -129,7 +129,7 @@ export function buildProxyGroups({
             name: PROXY_GROUPS.GAME_SERVICE,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Game.png`,
             type: "select",
-            proxies: defaultProxies,
+            proxies: defaultProxiesDirect,
         },
         {
             name: PROXY_GROUPS.HTTPDNS,
