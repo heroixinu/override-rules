@@ -19,6 +19,7 @@ export const PROXY_GROUPS = {
     FRONT_PROXY: "前置代理",
     STATIC_RESOURCES: "静态资源",
     NETWORK_TEST: "网络测试",
+    REGION_DETECTION: "地区检测",
     DEVELOPER: "开发者服务",
     GAME_SERVICE: "游戏服务",
     HTTPDNS: "HTTPDNS",
