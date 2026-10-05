@@ -114,6 +114,36 @@ export function buildProxyGroups({
             proxies: defaultProxies,
         },
         {
+            name: PROXY_GROUPS.NETWORK_TEST,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Speedtest.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
+            name: PROXY_GROUPS.DEVELOPER,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/GitHub.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
+            name: PROXY_GROUPS.GAME_SERVICE,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Game.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
+            name: PROXY_GROUPS.HTTPDNS,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/Reject.png`,
+            type: "select",
+            proxies: ["REJECT", "DIRECT"],
+        },
+        {
+            name: PROXY_GROUPS.PAYMENT_ECOMMERCE,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/PayPal.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
             name: PROXY_GROUPS.AI_SERVICE,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png`,
             type: "select",
@@ -145,6 +175,18 @@ export function buildProxyGroups({
         },
         {
             name: PROXY_GROUPS.MICROSOFT,
+            icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png`,
+            type: "select",
+            proxies: defaultProxies,
+        },
+        {
+            name: PROXY_GROUPS.ONEDRIVE,
+            icon: `${CDN_URL}/gh/heroixinu/override-rules@main/icons/Onedrive.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
+            name: PROXY_GROUPS.BING_COPILOT,
             icon: `${CDN_URL}/gh/powerfullz/override-rules@master/icons/Microsoft_Copilot.png`,
             type: "select",
             proxies: defaultProxies,
