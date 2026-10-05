@@ -1,3 +1,5 @@
 # Wi-Fi Calling / VoWiFi ePDG endpoints.
 # Covers both 3GPP-standard ePDG FQDNs and carrier-owned ePDG hostnames.
+# Apple network-region probe used by Wi-Fi Calling related region checks.
+DOMAIN,gspe1-ssl.ls.apple.com
 DOMAIN-KEYWORD,epdg
