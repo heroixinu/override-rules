@@ -34,6 +34,14 @@ export const ruleProviders: Record<string, RuleProvider> = {
         url: "https://ruleset.skk.moe/Clash/non_ip/cdn.txt",
         path: "./ruleset/CDNResources.txt",
     },
+    RegionDetection: {
+        type: "http",
+        behavior: "domain",
+        format: "yaml",
+        interval: 86400,
+        url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ip-geo-detect.yaml",
+        path: "./ruleset/RegionDetection.yaml",
+    },
     Speedtest: {
         type: "http",
         behavior: "classical",
