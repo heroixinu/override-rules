@@ -57,7 +57,13 @@ describe("Fork 定制回归", () => {
             if (!rule.startsWith("RULE-SET,")) continue;
             assert.ok(rule.split(",")[1] in ruleSets, rule);
         }
-        for (const key of ["VoWiFi", "VoWiFiCarriers", "RegionDetection", "Developer", "OneDrive"]) {
+        for (const key of [
+            "VoWiFi",
+            "VoWiFiCarriers",
+            "RegionDetection",
+            "Developer",
+            "OneDrive",
+        ]) {
             assert.ok(key in ruleSets, key);
         }
         assert.ok(ruleSets.AdditionalCDNResources.url.includes("heroixinu/override-rules"));
