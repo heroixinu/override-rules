@@ -150,6 +150,12 @@ export function buildProxyGroups({
             proxies: defaultProxiesDirect,
         },
         {
+            name: PROXY_GROUPS.OPENCODE,
+            icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/GitHub.png`,
+            type: "select",
+            proxies: defaultProxiesDirect,
+        },
+        {
             name: PROXY_GROUPS.AI_SERVICE,
             icon: `${CDN_URL}/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png`,
             type: "select",
