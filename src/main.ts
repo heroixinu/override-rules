@@ -6,11 +6,12 @@ https://github.com/powerfullz/override-rules
 - grouptype: 地区代理组类型（0=select 手动选择, 1=url-test 自动测速, 2=load-balance 负载均衡，默认 1）
   - 向后兼容：若未传 grouptype 但传了 loadbalance，则 loadbalance=true 映射为 grouptype=2，loadbalance=false 映射为 grouptype=1
 - landing: 自动检测带 `dialer-proxy` 字段的节点，无需用户传参
-- ipv6: 启用 IPv6 支持（默认 false）
+- ipv6: 启用 IPv6 支持（默认 false；与 DNS IPv6 独立）
+- dnsipv6: 允许 DNS 返回 IPv6 / AAAA 记录（默认 false，可单独开启）
 - tun: 启用 TUN 模式（默认 false）
 - full: 输出完整配置（适合纯内核启动，默认 false）
 - keepalive: 启用 tcp-keep-alive（默认 false）
-- fakeip: DNS 使用 FakeIP 模式（默认 true；传 false 时为 RedirHost）
+- fakeip: DNS 使用 FakeIP 模式（默认 false，即 RedirHost；传 true 时为 FakeIP）
 - quic: 保留传参兼容（不生成全局 UDP/443 拦截规则）
 - threshold: 地区节点数量小于该值时不显示分组（默认 2）
 - regex: 使用正则过滤模式（include-all + filter）写入各地区代理组，而非直接枚举节点名称（默认 false）

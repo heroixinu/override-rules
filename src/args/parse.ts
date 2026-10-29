@@ -31,6 +31,7 @@ export function buildFeatureFlags(args: ScriptArgs): FeatureFlags {
     return {
         groupType: parseGroupType(args),
         ipv6Enabled: parseBool(args.ipv6),
+        dnsIpv6Enabled: parseBool(args.dnsipv6, ARG_DEFAULTS.dnsIpv6Enabled),
         fullConfig: parseBool(args.full),
         keepAliveEnabled: parseBool(args.keepalive),
         fakeIPEnabled: parseBool(args.fakeip, ARG_DEFAULTS.fakeIPEnabled),

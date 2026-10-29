@@ -59,7 +59,7 @@ export function assembleConfig(
         sniffer: snifferConfig,
         dns: buildDns({
             fakeIPEnabled: flags.fakeIPEnabled,
-            ipv6Enabled: flags.ipv6Enabled,
+            dnsIpv6Enabled: flags.dnsIpv6Enabled,
             upstreamDns: config.dns,
         }),
         tun: buildTunConfig(flags.tunEnabled, nodes.hasTailscale),
