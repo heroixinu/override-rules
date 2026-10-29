@@ -18,6 +18,7 @@ export function buildRules(
         tailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         tailscale ? `DOMAIN-SUFFIX,ts.net,${PROXY_GROUPS.TAILSCALE}` : null,
         `GEOIP,private,DIRECT,no-resolve`,
+        `DOMAIN-SUFFIX,opencode.ai,${PROXY_GROUPS.OPENCODE}`,
         `RULE-SET,RegionDetection,${PROXY_GROUPS.REGION_DETECTION}`,
         `RULE-SET,BlockHttpDNS,${PROXY_GROUPS.HTTPDNS}`,
         `RULE-SET,ADBlock,${PROXY_GROUPS.AD_BLOCK}`,

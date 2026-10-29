@@ -24,6 +24,7 @@ export const PROXY_GROUPS = {
     GAME_SERVICE: "游戏服务",
     HTTPDNS: "HTTPDNS",
     PAYMENT_ECOMMERCE: "支付电商",
+    OPENCODE: "OpenCode",
     AI_SERVICE: "AI服务",
     CRYPTO: "加密货币",
     FINANCE: "金融服务",
