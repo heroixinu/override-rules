@@ -31,5 +31,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Run unit and fork regression tests
+        run: npm test
+
       - name: Verify reproducible artifacts build
         run: npm run artifacts
