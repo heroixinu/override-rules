@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.7](https://github.com/heroixinu/override-rules/releases/tag/v2.7.7) (2026-10-29)
+
+### Features
+
+- Add a dedicated `OpenCode` proxy group before `AI服务`, selecting `DIRECT` by default while allowing manual proxy overrides (#21).
+- Prioritize `DOMAIN-SUFFIX,opencode.ai,OpenCode` above Developer and generic AI rules.
+
 ## [2.7.6](https://github.com/powerfullz/override-rules/compare/src-v2.7.5...src-v2.7.6) (2026-09-16)
 
 
