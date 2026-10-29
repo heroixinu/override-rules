@@ -69,8 +69,11 @@ describe("Fork 定制回归", () => {
         assert.ok(ruleSets.AdditionalCDNResources.url.includes("heroixinu/override-rules"));
     });
 
-    it("保留 DNS 禁用 H3 和 gvisor TUN 栈", () => {
-        assert.equal(buildDns({ fakeIPEnabled: true, ipv6Enabled: false })["prefer-h3"], false);
-        assert.equal(buildTunConfig(true, false).stack, "gvisor");
+    it("保留 DNS 禁用 H3、Redir-host 默认值和 mips TUN 栈", () => {
+        const dns = buildDns({ fakeIPEnabled: false, dnsIpv6Enabled: false });
+        assert.equal(dns["prefer-h3"], false);
+        assert.equal(dns["enhanced-mode"], "redir-host");
+        assert.equal(dns.ipv6, false);
+        assert.equal(buildTunConfig(true, false).stack, "mips");
     });
 });

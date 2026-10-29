@@ -9,7 +9,8 @@ describe("buildFeatureFlags", () => {
         const flags = buildFeatureFlags({});
         assert.equal(flags.groupType, ARG_DEFAULTS.groupType);
         assert.equal(flags.countryThreshold, ARG_DEFAULTS.countryThreshold);
-        assert.equal(flags.fakeIPEnabled, true);
+        assert.equal(flags.fakeIPEnabled, false);
+        assert.equal(flags.dnsIpv6Enabled, false);
         assert.equal(flags.ipv6Enabled, false);
         assert.equal(flags.regexFilter, false);
     });
@@ -34,7 +35,14 @@ describe("buildFeatureFlags", () => {
         assert.equal(buildFeatureFlags({ loadbalance: "true", grouptype: "9" }).groupType, 2);
     });
 
-    it("fakeip 显式传 false 时关闭", () => {
+    it("fakeip 默认关闭，但允许显式开启或关闭", () => {
         assert.equal(buildFeatureFlags({ fakeip: "false" }).fakeIPEnabled, false);
+        assert.equal(buildFeatureFlags({ fakeip: "true" }).fakeIPEnabled, true);
+    });
+
+    it("dnsipv6 与 ipv6 参数相互独立", () => {
+        assert.equal(buildFeatureFlags({ ipv6: "true" }).dnsIpv6Enabled, false);
+        assert.equal(buildFeatureFlags({ ipv6: "false", dnsipv6: "true" }).dnsIpv6Enabled, true);
+        assert.equal(buildFeatureFlags({ ipv6: "true", dnsipv6: "false" }).dnsIpv6Enabled, false);
     });
 });

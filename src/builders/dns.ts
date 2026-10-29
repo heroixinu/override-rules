@@ -157,15 +157,15 @@ function inheritDnsFields(generated: DnsConfig, upstream?: DnsConfig): DnsConfig
 
 interface BuildDnsConfigInput {
     mode: "redir-host" | "fake-ip";
-    ipv6Enabled: boolean;
+    dnsIpv6Enabled: boolean;
     fakeIpFilter?: string[];
 }
 
 /** 生成脚本控制的核心 DNS 设置。 */
-function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput): DnsConfig {
+function buildDnsConfig({ mode, dnsIpv6Enabled, fakeIpFilter }: BuildDnsConfigInput): DnsConfig {
     const config: DnsConfig = {
         enable: true,
-        ipv6: ipv6Enabled,
+        ipv6: dnsIpv6Enabled,
         "prefer-h3": false,
         "enhanced-mode": mode,
         nameserver: ["system", "223.5.5.5", "119.29.29.29", "180.184.1.1"],
@@ -188,19 +188,20 @@ function buildDnsConfig({ mode, ipv6Enabled, fakeIpFilter }: BuildDnsConfigInput
 /** 构建 DNS 配置的输入参数。 */
 export interface BuildDnsInput {
     fakeIPEnabled: boolean;
-    ipv6Enabled: boolean;
+    /** 独立的 DNS IPv6 / AAAA 响应开关，不跟随全局 ipv6。 */
+    dnsIpv6Enabled: boolean;
     /** 上游订阅提供的 DNS 配置，将按字段规则继承或融合。 */
     upstreamDns?: DnsConfig;
 }
 
 /**
- * 根据 fakeIP 与 IPv6 开关生成最终 DNS 配置，并合并上游允许继承的字段。
+ * 根据 fakeIP 与独立的 DNS IPv6 开关生成配置，并继承上游 DNS 字段。
  * @param input - 详见 `BuildDnsInput`
  */
-export function buildDns({ fakeIPEnabled, ipv6Enabled, upstreamDns }: BuildDnsInput): DnsConfig {
+export function buildDns({ fakeIPEnabled, dnsIpv6Enabled, upstreamDns }: BuildDnsInput): DnsConfig {
     const generated = fakeIPEnabled
-        ? buildDnsConfig({ mode: "fake-ip", ipv6Enabled, fakeIpFilter: FAKE_IP_FILTER })
-        : buildDnsConfig({ mode: "redir-host", ipv6Enabled });
+        ? buildDnsConfig({ mode: "fake-ip", dnsIpv6Enabled, fakeIpFilter: FAKE_IP_FILTER })
+        : buildDnsConfig({ mode: "redir-host", dnsIpv6Enabled });
 
     return inheritDnsFields(generated, upstreamDns);
 }

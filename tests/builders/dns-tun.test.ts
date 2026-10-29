@@ -6,14 +6,14 @@ import { buildTunConfig } from "../../src/builders/tun";
 
 describe("buildDns", () => {
     it("fake-ip 模式包含 fake-ip-filter", () => {
-        const dns = buildDns({ fakeIPEnabled: true, ipv6Enabled: false });
+        const dns = buildDns({ fakeIPEnabled: true, dnsIpv6Enabled: false });
         assert.equal(dns["enhanced-mode"], "fake-ip");
         assert.ok(Array.isArray(dns["fake-ip-filter"]));
         assert.ok((dns["fake-ip-filter"] ?? []).length > 0);
     });
 
     it("redir-host 模式不含 fake-ip-filter", () => {
-        const dns = buildDns({ fakeIPEnabled: false, ipv6Enabled: false });
+        const dns = buildDns({ fakeIPEnabled: false, dnsIpv6Enabled: false });
         assert.equal(dns["enhanced-mode"], "redir-host");
         assert.equal(dns["fake-ip-filter"], undefined);
     });
@@ -21,7 +21,7 @@ describe("buildDns", () => {
     it("继承上游 nameserver-policy 与 fake-ip-filter", () => {
         const dns = buildDns({
             fakeIPEnabled: true,
-            ipv6Enabled: false,
+            dnsIpv6Enabled: false,
             upstreamDns: {
                 enable: true,
                 ipv6: false,
@@ -40,7 +40,7 @@ describe("buildDns", () => {
     it("脚本控制字段优先级高于上游", () => {
         const dns = buildDns({
             fakeIPEnabled: false,
-            ipv6Enabled: true,
+            dnsIpv6Enabled: true,
             upstreamDns: {
                 enable: true,
                 ipv6: false,
@@ -52,6 +52,13 @@ describe("buildDns", () => {
         });
         assert.equal(dns["enhanced-mode"], "redir-host");
         assert.equal(dns.ipv6, true);
+    });
+
+    it("DNS IPv6 可以独立关闭或开启", () => {
+        const disabled = buildDns({ fakeIPEnabled: false, dnsIpv6Enabled: false });
+        const enabled = buildDns({ fakeIPEnabled: false, dnsIpv6Enabled: true });
+        assert.equal(disabled.ipv6, false);
+        assert.equal(enabled.ipv6, true);
     });
 });
 
@@ -68,6 +75,10 @@ describe("buildTunConfig", () => {
     it("有 Tailscale 时不排除 Tailscale 地址段", () => {
         const tun = buildTunConfig(true, true);
         assert.deepEqual(tun["route-exclude-address"], ["192.168.0.0/16"]);
+    });
+
+    it("默认 TUN 网络栈使用 mips", () => {
+        assert.equal(buildTunConfig(true, false).stack, "mips");
     });
 
     it("保留设备名与 MTU", () => {

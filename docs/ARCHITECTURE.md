@@ -149,7 +149,8 @@ flowchart TD
 所有 URL 参数都有明确的默认值，集中在 `src/args/schema.ts` 的 `ARG_DEFAULTS`，由 `buildFeatureFlags()` 解析并回填。当前默认值包括：
 
 - `grouptype=1`（`url-test`）；若未指定 `grouptype`，仍兼容旧的 `loadbalance` 参数；
-- `fakeip=true`；
+- `fakeip=false`（默认 Redir-host，优先兼容 VoWiFi）；
+- `dnsipv6=false`（DNS AAAA 独立开关，即使 `ipv6=true` 也不会被动启用）；
 - `threshold=2`，少于两个节点的地区不会生成地区组；过滤后不足 2 个地区时整体展平；
 - `ipv6`、`full`、`keepalive`、`quic`、`regex`、`tun` 默认关闭。
 
@@ -210,4 +211,4 @@ YAML 模式的特点：
 两种模式共享同一套 `src/catalog/` 与 `src/builders/` 逻辑，区别仅在于运行时的数据来源和过滤方式。
 ## Fork-specific routing behavior
 
-This fork preserves dedicated service groups for OpenCode (DIRECT-first), VoWiFi, region detection, developer services, payments, OneDrive, and other locally added policy groups. Rule order is defined by `src/builders/rules.ts`; local DNS uses `prefer-h3: false`, TUN uses `gvisor`, and no global UDP/443 reject rule is emitted.
+This fork preserves dedicated service groups for OpenCode (DIRECT-first), VoWiFi, region detection, developer services, payments, OneDrive, and other locally added policy groups. Rule order is defined by `src/builders/rules.ts`; local DNS uses `prefer-h3: false` and defaults to Redir-host with DNS IPv6 disabled, TUN uses `mips`, and no global UDP/443 reject rule is emitted.

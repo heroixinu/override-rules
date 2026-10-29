@@ -7,6 +7,7 @@ export interface ScriptArgs {
     grouptype?: string;
     loadbalance?: string;
     ipv6?: string;
+    dnsipv6?: string;
     full?: string;
     keepalive?: string;
     fakeip?: string;
@@ -23,6 +24,7 @@ export type GroupType = 0 | 1 | 2;
 export interface FeatureFlags {
     groupType: GroupType;
     ipv6Enabled: boolean;
+    dnsIpv6Enabled: boolean;
     fullConfig: boolean;
     keepAliveEnabled: boolean;
     fakeIPEnabled: boolean;
