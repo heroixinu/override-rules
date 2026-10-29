@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.9.2](https://github.com/heroixinu/override-rules/releases/tag/v2.9.2) (2026-10-29)
+
+### Upstream synchronization
+
+- Merge upstream powerfullz/override-rules 2.9.1 modular architecture, proxy-group stabilization, Tailscale isolation, and automatic region flattening (#23).
+- Include upstream regression tests and use CI to validate fork-specific routing.
+
+### Fork behavior preserved
+
+- Keep OpenCode DIRECT-first, VoWiFi, region detection, developer services, payment rules and other custom groups/providers.
+- Preserve domestic DIRECT routing, DNS `prefer-h3: false`, TUN `gvisor`, and no global UDP/443 rejection.
+
 ## [2.7.7](https://github.com/heroixinu/override-rules/releases/tag/v2.7.7) (2026-10-29)
 
 ### Features
