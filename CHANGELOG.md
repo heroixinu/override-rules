@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.9.3](https://github.com/heroixinu/override-rules/releases/tag/v2.9.3) (2026-10-29)
+
+### VoWiFi-compatible defaults
+
+- Default DNS enhancement mode is now `redir-host` (`fakeip=false`) to keep VoWiFi/IPsec working without relying on OpenClash to override Fake-IP.
+- Default TUN stack is now `mips` while keeping existing TUN enable and route exclusion behavior.
+- Add independent `dnsipv6` argument (default `false`), separate from root `ipv6`. Explicit `dnsipv6=true` and `fakeip=true` remain supported.
+- Extend tests to cover defaults, explicit overrides and no changes to OpenCode / VoWiFi routing (#24).
+
 ## [2.9.2](https://github.com/heroixinu/override-rules/releases/tag/v2.9.2) (2026-10-29)
 
 ### Upstream synchronization
