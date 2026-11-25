@@ -67,10 +67,11 @@ describe("Fork 定制回归", () => {
             assert.ok(key in ruleSets, key);
         }
         assert.ok(ruleSets.AdditionalCDNResources.url.includes("heroixinu/override-rules"));
-        assert.ok(ruleSets.GoogleFCM.url.includes("heroixinu/override-rules@main"));
-        assert.ok(
-            Object.values(ruleSets).every((provider) => !provider.url.includes("override-rules@master"))
-        );
+        assert.ok(!("GoogleFCM" in ruleSets));
+        assert.ok(!rules.some((rule) => rule.includes("GoogleFCM")));
+        for (const provider of Object.values(ruleSets)) {
+            assert.ok(!provider.url.includes("override-rules@master"));
+        }
     });
 
     it("保留 DNS 禁用 H3、Redir-host 默认值和 mips TUN 栈", () => {
@@ -79,5 +80,6 @@ describe("Fork 定制回归", () => {
         assert.equal(dns["enhanced-mode"], "redir-host");
         assert.equal(dns.ipv6, false);
         assert.equal(buildTunConfig(true, false).stack, "mips");
+        assert.equal(buildTunConfig(true, false).mtu, 9000);
     });
 });

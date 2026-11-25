@@ -135,7 +135,7 @@ describe("buildTunConfig", () => {
     it("保留设备名与 MTU", () => {
         const tun = buildTunConfig(false, false);
         assert.equal(tun.device, "mihomo");
-        assert.equal(tun.mtu, 1500);
+        assert.equal(tun.mtu, 9000);
         assert.equal(tun.enable, false);
     });
 });

@@ -370,7 +370,7 @@ describe("assembleConfig", () => {
     });
 
     it("引用同一份规则集与 Geo 数据源", () => {
-        const result = run({}, CONFIG);
+        const result = run({ adblock: "2" }, CONFIG);
         assert.deepEqual(result["rule-providers"], ruleSets);
         assert.equal(result["geodata-mode"], true);
         assert.ok(result["geox-url"]?.geoip);
@@ -401,11 +401,21 @@ describe("assembleConfig", () => {
         assert.ok("AdditionalFilter" in providers);
     });
 
-    it("adblock=2 时 ADBlock 使用默认的 217heidai 规则集", () => {
+    it("adblock=2 时 ADBlock 使用新版 217heidai MRS 规则集", () => {
         const result = run({ adblock: "2" }, CONFIG);
         const providers = result["rule-providers"] ?? {};
         assert.equal(providers.ADBlock, ruleSets.ADBlock);
+        assert.match(providers.ADBlock?.url ?? "", /@dist\/adblockmihomolite\.mrs$/);
+        assert.equal(providers.ADBlock?.format, "mrs");
         assert.ok("AdditionalFilter" in providers);
+    });
+
+    it("默认广告规则为 AWAvenue，并隔离不同来源的缓存路径", () => {
+        const defaults = run({}, CONFIG);
+        const sources = ["1", "2", "3"].map((adblock) => run({ adblock }, CONFIG));
+        const paths = sources.map((result) => result["rule-providers"]?.ADBlock?.path);
+        assert.equal(new Set(paths).size, 3);
+        assert.deepEqual(defaults["rule-providers"]?.ADBlock, sources[2]["rule-providers"]?.ADBlock);
     });
 
     it("adblock=3 时 ADBlock 指向 AWAvenue", () => {

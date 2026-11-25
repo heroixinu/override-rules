@@ -27,8 +27,8 @@ function parseGroupType(args: ScriptArgs): GroupType {
  * 解析 `adblock` 参数。
  * - `0`：关闭去广告规则
  * - `1`：adrules.top
- * - `2`：217heidai（默认）
- * - `3`：AWAvenue
+ * - `2`：217heidai
+ * - `3`：AWAvenue（默认）
  * - 非法值回退为默认值。
  */
 function parseAdblockSource(args: ScriptArgs): AdblockSource {

@@ -12,10 +12,10 @@ export const ruleSets = {
     ADBlock: {
         type: "http",
         behavior: "domain",
-        format: "yaml",
+        format: "mrs",
         interval: 86400,
-        url: `${CDN_URL}/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.yaml`,
-        path: "./ruleset/ADBlock.yaml",
+        url: `${CDN_URL}/gh/217heidai/adblockfilters@dist/adblockmihomolite.mrs`,
+        path: "./ruleset/ADBlock-217heidai.mrs",
     },
     SogouInput: {
         type: "http",
@@ -64,14 +64,6 @@ export const ruleSets = {
         interval: 86400,
         url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/SteamFix.list`,
         path: "./ruleset/SteamFix.list",
-    },
-    GoogleFCM: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/FirebaseCloudMessaging.list`,
-        path: "./ruleset/FirebaseCloudMessaging.list",
     },
     AdditionalFilter: {
         type: "http",
@@ -219,7 +211,7 @@ export const adblockAlternatives = {
         format: "mrs",
         interval: 86400,
         url: "https://adrules.top/adrules-mihomo.mrs",
-        path: "./ruleset/ADBlock.mrs",
+        path: "./ruleset/ADBlock-ADRules.mrs",
     },
     3: {
         type: "http",
@@ -227,7 +219,7 @@ export const adblockAlternatives = {
         format: "mrs",
         interval: 86400,
         url: `${CDN_URL}/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs`,
-        path: "./ruleset/ADBlock.mrs",
+        path: "./ruleset/ADBlock-AWAvenue.mrs",
     },
 } satisfies Record<1 | 3, RuleProvider>;
 

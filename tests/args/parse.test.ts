@@ -12,7 +12,7 @@ describe("buildFeatureFlags", () => {
         assert.equal(flags.ipv6Enabled, ARG_DEFAULTS.ipv6Enabled);
         assert.equal(flags.dnsIpv6Enabled, false);
         assert.equal(flags.fakeIPEnabled, false);
-        assert.equal(flags.adblockSource, 2);
+        assert.equal(flags.adblockSource, 3);
         assert.equal(flags.fullConfig, ARG_DEFAULTS.fullConfig);
         assert.equal(flags.keepAliveEnabled, ARG_DEFAULTS.keepAliveEnabled);
         assert.equal(flags.fakeIPEnabled, ARG_DEFAULTS.fakeIPEnabled);

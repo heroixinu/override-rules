@@ -67,7 +67,6 @@ export function buildRules({
         ruleSet("Weibo", PROXY_GROUPS.WEIBO),
         ruleSet("TikTok", PROXY_GROUPS.TIKTOK),
         `GEOSITE,steam,${PROXY_GROUPS.SELECT}`,
-        ruleSet("GoogleFCM", "DIRECT"),
         `GEOSITE,apple,${PROXY_GROUPS.APPLE}`,
         `GEOSITE,microsoft,${PROXY_GROUPS.MICROSOFT}`,
         `GEOSITE,google,${PROXY_GROUPS.GOOGLE}`,
