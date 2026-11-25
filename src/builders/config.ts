@@ -4,14 +4,14 @@
 
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { ICONS } from "../catalog/icons";
-import { ruleSets } from "../catalog/rule-sets";
+import { adblockAlternatives, ruleSets } from "../catalog/rule-sets";
 import { buildDns } from "./dns";
 import { buildFullConfig } from "./full-config";
 import { geoxUrl } from "./geox";
 import { buildRules } from "./rules";
 import { snifferConfig } from "./sniffer";
 import { buildTunConfig } from "./tun";
-import type { FeatureFlags } from "../types/args";
+import type { AdblockSource, FeatureFlags } from "../types/args";
 import type { ClashConfig } from "../types/clash";
 import type { NodeAnalysis, ProxyGroup } from "../types/proxy";
 
@@ -24,7 +24,7 @@ function appendGlobalGroup(groups: ProxyGroup[]): ProxyGroup[] {
         icon: ICONS.global,
         "include-all": true,
         type: "select",
-        proxies: groups.map((group) => String(group.name)),
+        proxies: groups.map((group) => group.name),
     };
 
     return [...groups, global];
@@ -49,13 +49,31 @@ export function assembleConfig(
     config: ClashConfig,
     { flags, nodes, proxyGroups }: AssembleConfigInput
 ): ClashConfig {
+    const { ADBlock, AdditionalFilter, ...baseRuleSets } = ruleSets;
+    type AdblockProvider =
+        typeof ADBlock | (typeof adblockAlternatives)[keyof typeof adblockAlternatives];
+    const providersBySource: Record<AdblockSource, AdblockProvider | undefined> = {
+        0: undefined,
+        1: adblockAlternatives[1],
+        2: ADBlock,
+        3: adblockAlternatives[3],
+    };
+    const adblockProvider = providersBySource[flags.adblockSource];
+
     return {
-        proxies: config.proxies,
+        proxies: nodes.allNodes,
         ...(config.hosts !== undefined && { hosts: config.hosts }),
         ...(flags.fullConfig && buildFullConfig(flags)),
         "proxy-groups": appendGlobalGroup(proxyGroups),
-        "rule-providers": ruleSets,
-        rules: buildRules({ quicEnabled: flags.quicEnabled, hasTailscale: nodes.hasTailscale }),
+        "rule-providers": {
+            ...baseRuleSets,
+            ...(adblockProvider && { ADBlock: adblockProvider, AdditionalFilter }),
+        },
+        rules: buildRules({
+            quicEnabled: flags.quicEnabled,
+            hasTailscale: nodes.hasTailscale,
+            adblockSource: flags.adblockSource,
+        }),
         sniffer: snifferConfig,
         dns: buildDns({
             fakeIPEnabled: flags.fakeIPEnabled,

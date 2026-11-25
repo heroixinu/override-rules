@@ -15,6 +15,7 @@ https://github.com/powerfullz/override-rules
 - quic: 保留传参兼容（不生成全局 UDP/443 拦截规则）
 - threshold: 地区节点数量小于该值时不显示分组（默认 2）
 - regex: 使用正则过滤模式（include-all + filter）写入各地区代理组，而非直接枚举节点名称（默认 false）
+- adblock: 去广告规则（0=关闭，1=adrules.top，2=217heidai，3=AWAvenue，默认 2）
 
 源码位于 `src/`，入口为 `src/main.ts`。
 */
@@ -45,7 +46,7 @@ function readRawArgs(): ScriptArgs {
  * @param config - 上游订阅配置
  */
 function main(config: ClashConfig): ClashConfig {
-    if (!config.proxies || !Array.isArray(config.proxies)) {
+    if (!Array.isArray(config.proxies)) {
         throw new Error("[powerfullz 的覆写脚本] 错误：Clash 配置中缺少有效的 proxies 字段");
     }
 

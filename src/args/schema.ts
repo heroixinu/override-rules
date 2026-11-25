@@ -8,8 +8,22 @@ export const ARG_DEFAULTS = {
     groupType: 1,
     /** 地区节点数量小于该值时不生成地区组。 */
     countryThreshold: 2,
-    /** 默认 Redir-host，优先保障 VoWiFi 等使用真实 IP 的服务。 */
-    fakeIPEnabled: false,
-    /** DNS AAAA 响应默认关闭，独立于全局 ipv6 开关。 */
+    /** 启用 IPv6 支持。 */
+    ipv6Enabled: false,
+    /** DNS AAAA 响应独立开关。 */
     dnsIpv6Enabled: false,
+    /** 输出完整内核配置。 */
+    fullConfig: false,
+    /** 启用 TCP keep-alive。 */
+    keepAliveEnabled: false,
+    /** 使用 fake-ip 增强模式。 */
+    fakeIPEnabled: false,
+    /** QUIC 兼容参数，本 Fork 不全局拦截 UDP 443。 */
+    quicEnabled: false,
+    /** 使用正则过滤模式。 */
+    regexFilter: false,
+    /** 启用 TUN 模式。 */
+    tunEnabled: false,
+    /** 去广告规则来源：0=关闭，1=adrules.top，2=217heidai，3=AWAvenue。 */
+    adblockSource: 2,
 } as const;
