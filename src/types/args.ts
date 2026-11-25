@@ -15,10 +15,14 @@ export interface ScriptArgs {
     regex?: string;
     threshold?: string;
     tun?: string;
+    adblock?: string;
 }
 
 /** 地区代理组类型：0=select（手动选择），1=url-test（自动测速），2=load-balance（负载均衡）。 */
 export type GroupType = 0 | 1 | 2;
+
+/** 去广告规则来源：0=关闭，1=adrules.top，2=217heidai，3=AWAvenue。 */
+export type AdblockSource = 0 | 1 | 2 | 3;
 
 /** 解析后的功能开关集合，下游模块无需再关心参数来源或缺失情况。 */
 export interface FeatureFlags {
@@ -32,4 +36,5 @@ export interface FeatureFlags {
     regexFilter: boolean;
     countryThreshold: number;
     tunEnabled: boolean;
+    adblockSource: AdblockSource;
 }

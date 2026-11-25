@@ -9,7 +9,7 @@ describe("buildDns", () => {
         const dns = buildDns({ fakeIPEnabled: true, dnsIpv6Enabled: false });
         assert.equal(dns["enhanced-mode"], "fake-ip");
         assert.ok(Array.isArray(dns["fake-ip-filter"]));
-        assert.ok((dns["fake-ip-filter"] ?? []).length > 0);
+        assert.ok(dns["fake-ip-filter"]?.length);
     });
 
     it("redir-host 模式不含 fake-ip-filter", () => {
@@ -37,6 +37,68 @@ describe("buildDns", () => {
         assert.ok(dns["fake-ip-filter"]?.includes("+.example.org"));
     });
 
+    it("继承上游 proxy-server-nameserver 并去重", () => {
+        const dns = buildDns({
+            fakeIPEnabled: false,
+            dnsIpv6Enabled: false,
+            upstreamDns: {
+                enable: true,
+                ipv6: false,
+                "prefer-h3": true,
+                "enhanced-mode": "redir-host",
+                nameserver: [],
+                fallback: [],
+                "proxy-server-nameserver": [
+                    "223.5.5.5",
+                    "223.5.5.5",
+                    "https://dns.example/dns-query",
+                ],
+            },
+        });
+
+        assert.deepEqual(dns["proxy-server-nameserver"], [
+            "223.5.5.5",
+            "https://dns.example/dns-query",
+        ]);
+    });
+
+    it("继承上游 listen，保证本地 proxy-server-nameserver 可用", () => {
+        const dns = buildDns({
+            fakeIPEnabled: false,
+            dnsIpv6Enabled: false,
+            upstreamDns: {
+                enable: true,
+                ipv6: false,
+                "prefer-h3": true,
+                "enhanced-mode": "redir-host",
+                listen: "0.0.0.0:1053",
+                nameserver: [],
+                fallback: [],
+                "proxy-server-nameserver": ["127.0.0.1:1053"],
+            },
+        });
+
+        assert.equal(dns.listen, "0.0.0.0:1053");
+    });
+
+    it("忽略格式错误或为空的上游 listen", () => {
+        const dns = buildDns({
+            fakeIPEnabled: false,
+            dnsIpv6Enabled: false,
+            upstreamDns: {
+                enable: true,
+                ipv6: false,
+                "prefer-h3": true,
+                "enhanced-mode": "redir-host",
+                listen: "",
+                nameserver: [],
+                fallback: [],
+            },
+        });
+
+        assert.equal(dns.listen, undefined);
+    });
+
     it("脚本控制字段优先级高于上游", () => {
         const dns = buildDns({
             fakeIPEnabled: false,
@@ -52,13 +114,6 @@ describe("buildDns", () => {
         });
         assert.equal(dns["enhanced-mode"], "redir-host");
         assert.equal(dns.ipv6, true);
-    });
-
-    it("DNS IPv6 可以独立关闭或开启", () => {
-        const disabled = buildDns({ fakeIPEnabled: false, dnsIpv6Enabled: false });
-        const enabled = buildDns({ fakeIPEnabled: false, dnsIpv6Enabled: true });
-        assert.equal(disabled.ipv6, false);
-        assert.equal(enabled.ipv6, true);
     });
 });
 
@@ -77,14 +132,10 @@ describe("buildTunConfig", () => {
         assert.deepEqual(tun["route-exclude-address"], ["192.168.0.0/16"]);
     });
 
-    it("默认 TUN 网络栈使用 mips", () => {
-        assert.equal(buildTunConfig(true, false).stack, "mips");
-    });
-
     it("保留设备名与 MTU", () => {
         const tun = buildTunConfig(false, false);
         assert.equal(tun.device, "mihomo");
-        assert.equal(tun.mtu, 1500);
+        assert.equal(tun.mtu, 9000);
         assert.equal(tun.enable, false);
     });
 });

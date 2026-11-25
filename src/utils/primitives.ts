@@ -26,6 +26,8 @@ export function parseNumber(value: unknown, defaultValue = 0): number {
         return defaultValue;
     }
 
+    // 函数契约就是接受任意用户输入并尽力解析，宽松字符串化是预期行为
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     const num = parseInt(String(value), 10);
     return Number.isNaN(num) ? defaultValue : num;
 }
@@ -35,7 +37,7 @@ export function parseNumber(value: unknown, defaultValue = 0): number {
  * @param elements - 任意数量的元素或元素数组，允许混入假值
  */
 export function buildList<T>(...elements: Array<T | T[] | false | null | undefined>): T[] {
-    return elements.flat().filter(Boolean) as T[];
+    return elements.flat().filter((item): item is T => Boolean(item));
 }
 
 /**

@@ -48,7 +48,7 @@ describe("assembleConfig", () => {
         assert.equal(global?.["include-all"], true);
         assert.deepEqual(
             global?.proxies,
-            groups.slice(0, -1).map((item) => String(item.name))
+            groups.slice(0, -1).map((item) => item.name)
         );
     });
 
@@ -56,6 +56,13 @@ describe("assembleConfig", () => {
         const result = run({}, CONFIG);
         assert.deepEqual(result.proxies, CONFIG.proxies);
         assert.deepEqual(result.hosts, CONFIG.hosts);
+    });
+
+    it("丢弃无名称节点，不写入 proxies 或代理组", () => {
+        const result = run({}, { proxies: [{ name: "" }, { name: "香港01" }] });
+
+        assert.deepEqual(result.proxies, [{ name: "香港01" }]);
+        assert.deepEqual(group(result, PROXY_GROUPS.SELECT)?.proxies, ["香港01", "DIRECT"]);
     });
 
     it("无上游 hosts 时不输出 hosts 字段", () => {
@@ -363,9 +370,76 @@ describe("assembleConfig", () => {
     });
 
     it("引用同一份规则集与 Geo 数据源", () => {
-        const result = run({}, CONFIG);
-        assert.equal(result["rule-providers"], ruleSets);
+        const result = run({ adblock: "2" }, CONFIG);
+        assert.deepEqual(result["rule-providers"], ruleSets);
         assert.equal(result["geodata-mode"], true);
         assert.ok(result["geox-url"]?.geoip);
+    });
+
+    it("adblock=0 时广告拦截组隐藏", () => {
+        const result = run({ adblock: "0" }, CONFIG);
+        assert.equal(group(result, PROXY_GROUPS.AD_BLOCK)?.hidden, true);
+    });
+
+    it("adblock>0 时广告拦截组可见", () => {
+        const result = run({ adblock: "2" }, CONFIG);
+        assert.equal(group(result, PROXY_GROUPS.AD_BLOCK)?.hidden, undefined);
+    });
+
+    it("adblock=0 时 rule-providers 不包含广告规则集", () => {
+        const result = run({ adblock: "0" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.ok(!("ADBlock" in providers));
+        assert.ok(!("AdditionalFilter" in providers));
+    });
+
+    it("adblock=1 时 ADBlock 指向 adrules.top", () => {
+        const result = run({ adblock: "1" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.equal(providers.ADBlock?.url, "https://adrules.top/adrules-mihomo.mrs");
+        assert.equal(providers.ADBlock?.format, "mrs");
+        assert.ok("AdditionalFilter" in providers);
+    });
+
+    it("adblock=2 时 ADBlock 使用新版 217heidai MRS 规则集", () => {
+        const result = run({ adblock: "2" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.equal(providers.ADBlock, ruleSets.ADBlock);
+        assert.match(providers.ADBlock?.url ?? "", /@dist\/adblockmihomolite\.mrs$/);
+        assert.equal(providers.ADBlock?.format, "mrs");
+        assert.ok("AdditionalFilter" in providers);
+    });
+
+    it("默认广告规则为 AWAvenue，并隔离不同来源的缓存路径", () => {
+        const defaults = run({}, CONFIG);
+        const sources = ["1", "2", "3"].map((adblock) => run({ adblock }, CONFIG));
+        const paths = sources.map((result) => result["rule-providers"]?.ADBlock?.path);
+        assert.equal(new Set(paths).size, 3);
+        assert.deepEqual(
+            defaults["rule-providers"]?.ADBlock,
+            sources[2]["rule-providers"]?.ADBlock
+        );
+    });
+
+    it("adblock=3 时 ADBlock 指向 AWAvenue", () => {
+        const result = run({ adblock: "3" }, CONFIG);
+        const providers = result["rule-providers"] ?? {};
+        assert.match(providers.ADBlock?.url ?? "", /AWAvenue-Ads-Rule/);
+        assert.equal(providers.ADBlock?.format, "mrs");
+        assert.ok("AdditionalFilter" in providers);
+    });
+
+    it("非 regex 模式下 Weibo 组不使用 include-all", () => {
+        const result = run({}, CONFIG);
+        const weibo = group(result, PROXY_GROUPS.WEIBO);
+        assert.equal(weibo?.["include-all"], undefined);
+        assert.ok(weibo?.proxies !== undefined);
+        assert.ok(weibo?.proxies?.length);
+    });
+
+    it("regex 模式下 Weibo 组使用 include-all", () => {
+        const result = run({ regex: "true" }, CONFIG);
+        const weibo = group(result, PROXY_GROUPS.WEIBO);
+        assert.equal(weibo?.["include-all"], true);
     });
 });

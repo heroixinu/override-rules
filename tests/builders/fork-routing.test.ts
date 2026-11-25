@@ -31,7 +31,7 @@ describe("Fork 定制回归", () => {
     });
 
     it("OpenCode 规则在开发者及 AI 总规则前", () => {
-        const rules = buildRules({ quicEnabled: false, hasTailscale: false });
+        const rules = buildRules({ quicEnabled: false, hasTailscale: false, adblockSource: 2 });
         const openCode = rules.indexOf("DOMAIN-SUFFIX,opencode.ai,OpenCode");
         const developer = rules.indexOf("RULE-SET,Developer,开发者服务");
         const ai = rules.indexOf("GEOSITE,category-ai-!cn,AI服务");
@@ -39,7 +39,7 @@ describe("Fork 定制回归", () => {
     });
 
     it("没有全局 UDP443 拦截，保留中国直连与 VoWiFi 专用规则", () => {
-        const rules = buildRules({ quicEnabled: false, hasTailscale: false });
+        const rules = buildRules({ quicEnabled: false, hasTailscale: false, adblockSource: 2 });
         assert.ok(!rules.some((r) => r.startsWith("AND,((DST-PORT,443)")));
         for (const rule of [
             "GEOSITE,cn,DIRECT",
@@ -52,7 +52,7 @@ describe("Fork 定制回归", () => {
     });
 
     it("规则集全部存在于注册表且保留本地差异", () => {
-        const rules = buildRules({ quicEnabled: false, hasTailscale: false });
+        const rules = buildRules({ quicEnabled: false, hasTailscale: false, adblockSource: 2 });
         for (const rule of rules) {
             if (!rule.startsWith("RULE-SET,")) continue;
             assert.ok(rule.split(",")[1] in ruleSets, rule);
@@ -67,6 +67,11 @@ describe("Fork 定制回归", () => {
             assert.ok(key in ruleSets, key);
         }
         assert.ok(ruleSets.AdditionalCDNResources.url.includes("heroixinu/override-rules"));
+        assert.ok(!("GoogleFCM" in ruleSets));
+        assert.ok(!rules.some((rule) => rule.includes("GoogleFCM")));
+        for (const provider of Object.values(ruleSets)) {
+            assert.ok(!provider.url.includes("override-rules@master"));
+        }
     });
 
     it("保留 DNS 禁用 H3、Redir-host 默认值和 mips TUN 栈", () => {
@@ -75,5 +80,6 @@ describe("Fork 定制回归", () => {
         assert.equal(dns["enhanced-mode"], "redir-host");
         assert.equal(dns.ipv6, false);
         assert.equal(buildTunConfig(true, false).stack, "mips");
+        assert.equal(buildTunConfig(true, false).mtu, 9000);
     });
 });

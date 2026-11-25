@@ -23,24 +23,28 @@ import { isNotNull } from "../utils/primitives";
 import { buildNodeExcludeFilter, combineExcludeFilters } from "../utils/regex";
 import type { GroupBuildContext, ProxyGroup } from "../types/proxy";
 
+/**
+ * 生成「手动选择」组：展平模式下「选择代理」已直接列出全部非落地节点，不再生成该组。
+ * 分组模式保留该组：regex 模式交给内核动态填充，否则按上游顺序枚举。
+ */
+function buildManualGroup(ctx: GroupBuildContext): ProxyGroup | null {
+    if (ctx.nodes.regionLayout.mode !== "grouped") return null;
+
+    if (ctx.flags.regexFilter) {
+        return selectAllGroup(
+            PROXY_GROUPS.MANUAL,
+            ICONS.manual,
+            buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
+        );
+    }
+    return selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames);
+}
+
 /** 顶层选择类代理组：选择代理、手动选择、以及链式代理相关组。 */
 function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
-    // 展平模式下「选择代理」已直接列出全部非落地节点，不再生成高度重合的「手动选择」组。
-    // 分组模式保留该组：regex 模式交给内核动态填充，否则按上游顺序枚举。
-    const manualGroup =
-        ctx.nodes.regionLayout.mode === "grouped"
-            ? ctx.flags.regexFilter
-                ? selectAllGroup(
-                      PROXY_GROUPS.MANUAL,
-                      ICONS.manual,
-                      buildNodeExcludeFilter(ctx.nodes.tailscaleNodes)
-                  )
-                : selectGroup(PROXY_GROUPS.MANUAL, ICONS.manual, ctx.nodes.manualNames)
-            : null;
-
     return [
         selectGroup(PROXY_GROUPS.SELECT, ICONS.select, ctx.lists.defaultSelector),
-        manualGroup,
+        buildManualGroup(ctx),
         ctx.nodes.landing
             ? selectGroup(PROXY_GROUPS.FRONT_PROXY, ICONS.frontProxy, ctx.lists.frontProxySelector)
             : null,
@@ -57,7 +61,7 @@ function buildFrontGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
 /** 由声明式目录生成的服务代理组。 */
 function buildServiceGroups(ctx: GroupBuildContext): ProxyGroup[] {
     return serviceGroups.map((def) =>
-        selectGroup(def.name, def.icon, def.proxies(ctx), def.includeAll)
+        selectGroup(def.name, def.icon, def.proxies(ctx), def.includeAll && ctx.flags.regexFilter)
     );
 }
 
@@ -73,7 +77,13 @@ function buildTailGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
                   true
               )
             : null,
-        selectGroup(PROXY_GROUPS.AD_BLOCK, ICONS.adBlock, ["REJECT", "REJECT-DROP", "DIRECT"]),
+        selectGroup(
+            PROXY_GROUPS.AD_BLOCK,
+            ICONS.adBlock,
+            ["REJECT", "REJECT-DROP", "DIRECT"],
+            false,
+            ctx.flags.adblockSource === 0
+        ),
         selectGroup(PROXY_GROUPS.FINAL, ICONS.final, [PROXY_GROUPS.SELECT, "DIRECT"]),
         urlTestGroup(PROXY_GROUPS.AUTO, ICONS.auto, ctx.lists.defaultFallback),
         fallbackGroup(PROXY_GROUPS.FALLBACK, ICONS.fallback, ctx.lists.defaultFallback),
@@ -105,7 +115,6 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
 
     const countryGroups = nodes.regionLayout.groupedCountries.map((country) => {
         const meta = countriesMeta[country];
-        if (!meta) return null;
 
         const excludeFilter = combineExcludeFilters(meta.excludePattern, tailscaleExcludeFilter);
         const nodeSource = flags.regexFilter
@@ -114,7 +123,7 @@ function buildRegionGroups(ctx: GroupBuildContext): Array<ProxyGroup | null> {
                   filter: meta.pattern,
                   ...(excludeFilter ? { "exclude-filter": excludeFilter } : {}),
               }
-            : { proxies: nodes.countryNodes[country]?.map((node) => node.name) };
+            : { proxies: nodes.countryNodes[country].map((node) => node.name) };
 
         return buildGroupByType({
             name: countryGroupName(country),

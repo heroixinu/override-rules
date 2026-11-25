@@ -5,13 +5,19 @@
 import { PROXY_GROUPS } from "../catalog/group-names";
 import { ruleSet } from "../catalog/rule-sets";
 import { isNotNull } from "../utils/primitives";
+import type { AdblockSource } from "../types/args";
 
 export interface BuildRulesInput {
     quicEnabled: boolean;
     hasTailscale: boolean;
+    adblockSource: AdblockSource;
 }
 
-export function buildRules({ quicEnabled: _quicEnabled, hasTailscale }: BuildRulesInput): string[] {
+export function buildRules({
+    quicEnabled: _quicEnabled,
+    hasTailscale,
+    adblockSource,
+}: BuildRulesInput): string[] {
     return [
         hasTailscale ? `IP-CIDR,100.64.0.0/10,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
         hasTailscale ? `IP-CIDR,fd7a:115c:a1e0::/48,${PROXY_GROUPS.TAILSCALE},no-resolve` : null,
@@ -20,8 +26,8 @@ export function buildRules({ quicEnabled: _quicEnabled, hasTailscale }: BuildRul
         `DOMAIN-SUFFIX,opencode.ai,${PROXY_GROUPS.OPENCODE}`,
         ruleSet("RegionDetection", PROXY_GROUPS.REGION_DETECTION),
         ruleSet("BlockHttpDNS", PROXY_GROUPS.HTTPDNS),
-        ruleSet("ADBlock", PROXY_GROUPS.AD_BLOCK),
-        ruleSet("AdditionalFilter", PROXY_GROUPS.AD_BLOCK),
+        adblockSource > 0 ? ruleSet("ADBlock", PROXY_GROUPS.AD_BLOCK) : null,
+        adblockSource > 0 ? ruleSet("AdditionalFilter", PROXY_GROUPS.AD_BLOCK) : null,
         ruleSet("SogouInput", PROXY_GROUPS.SOGOU_INPUT),
         ruleSet("Speedtest", PROXY_GROUPS.NETWORK_TEST),
         ruleSet("Developer", PROXY_GROUPS.DEVELOPER),
@@ -61,7 +67,6 @@ export function buildRules({ quicEnabled: _quicEnabled, hasTailscale }: BuildRul
         ruleSet("Weibo", PROXY_GROUPS.WEIBO),
         ruleSet("TikTok", PROXY_GROUPS.TIKTOK),
         `GEOSITE,steam,${PROXY_GROUPS.SELECT}`,
-        ruleSet("GoogleFCM", "DIRECT"),
         `GEOSITE,apple,${PROXY_GROUPS.APPLE}`,
         `GEOSITE,microsoft,${PROXY_GROUPS.MICROSOFT}`,
         `GEOSITE,google,${PROXY_GROUPS.GOOGLE}`,

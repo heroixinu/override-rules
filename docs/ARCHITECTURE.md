@@ -161,7 +161,7 @@ flowchart TD
 脚本不会无条件覆盖上游配置的全部字段：
 
 - 始终保留上游 `hosts`；
-- 在生成 DNS 配置后，合并上游的 `nameserver-policy`、`proxy-server-nameserver-policy` 和 `fake-ip-filter`；
+- 在生成 DNS 配置后，合并上游的 `nameserver-policy`、`proxy-server-nameserver-policy`、`proxy-server-nameserver`、`listen` 和 `fake-ip-filter`；
 - 脚本生成的 DNS 核心设置（如增强模式、IPv6 开关和默认 DNS 列表）保持优先级。
 
 这样既能维持脚本的统一 DNS 行为，也能保留订阅提供方针对特定域名的策略。
@@ -212,3 +212,7 @@ YAML 模式的特点：
 ## Fork-specific routing behavior
 
 This fork preserves dedicated service groups for OpenCode (DIRECT-first), VoWiFi, region detection, developer services, payments, OneDrive, and other locally added policy groups. Rule order is defined by `src/builders/rules.ts`; local DNS uses `prefer-h3: false` and defaults to Redir-host with DNS IPv6 disabled, TUN uses `mips`, and no global UDP/443 reject rule is emitted.
+
+## 2.10.2 上游同步
+
+新增 `adblock` 参数，默认 3（AWAvenue）；DNS 保留独立 `dnsipv6` 和禁用 H3，同时继承上游 `listen` 与 `proxy-server-nameserver`。FCM 交由常规规则分流，TUN MTU 为 9000；217heidai Lite 改用 dist 分支的 MRS 文件，各广告源独立缓存。

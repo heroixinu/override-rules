@@ -12,10 +12,10 @@ export const ruleSets = {
     ADBlock: {
         type: "http",
         behavior: "domain",
-        format: "yaml",
+        format: "mrs",
         interval: 86400,
-        url: `${CDN_URL}/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.yaml`,
-        path: "./ruleset/ADBlock.yaml",
+        url: `${CDN_URL}/gh/217heidai/adblockfilters@dist/adblockmihomolite.mrs`,
+        path: "./ruleset/ADBlock-217heidai.mrs",
     },
     SogouInput: {
         type: "http",
@@ -46,7 +46,7 @@ export const ruleSets = {
         behavior: "classical",
         format: "text",
         interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/TikTok.list`,
+        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/TikTok.list`,
         path: "./ruleset/TikTok.list",
     },
     EHentai: {
@@ -54,7 +54,7 @@ export const ruleSets = {
         behavior: "classical",
         format: "text",
         interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/EHentai.list`,
+        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/EHentai.list`,
         path: "./ruleset/EHentai.list",
     },
     SteamFix: {
@@ -62,23 +62,15 @@ export const ruleSets = {
         behavior: "classical",
         format: "text",
         interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/SteamFix.list`,
+        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/SteamFix.list`,
         path: "./ruleset/SteamFix.list",
-    },
-    GoogleFCM: {
-        type: "http",
-        behavior: "classical",
-        format: "text",
-        interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/FirebaseCloudMessaging.list`,
-        path: "./ruleset/FirebaseCloudMessaging.list",
     },
     AdditionalFilter: {
         type: "http",
         behavior: "classical",
         format: "text",
         interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/AdditionalFilter.list`,
+        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/AdditionalFilter.list`,
         path: "./ruleset/AdditionalFilter.list",
     },
     AdditionalCDNResources: {
@@ -94,7 +86,7 @@ export const ruleSets = {
         behavior: "classical",
         format: "text",
         interval: 86400,
-        url: `${CDN_URL}/gh/powerfullz/override-rules@master/ruleset/Weibo.list`,
+        url: `${CDN_URL}/gh/heroixinu/override-rules@main/ruleset/Weibo.list`,
         path: "./ruleset/Weibo.list",
     },
     GFWList: {
@@ -210,6 +202,26 @@ export const ruleSets = {
         path: "./ruleset/VoWiFiCarriers.list",
     },
 } satisfies Record<string, RuleProvider>;
+
+/** `ADBlock` 的替代下载源（1=adrules.top，3=AWAvenue；2 使用 `ruleSets.ADBlock`）。 */
+export const adblockAlternatives = {
+    1: {
+        type: "http",
+        behavior: "domain",
+        format: "mrs",
+        interval: 86400,
+        url: "https://adrules.top/adrules-mihomo.mrs",
+        path: "./ruleset/ADBlock-ADRules.mrs",
+    },
+    3: {
+        type: "http",
+        behavior: "domain",
+        format: "mrs",
+        interval: 86400,
+        url: `${CDN_URL}/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs`,
+        path: "./ruleset/ADBlock-AWAvenue.mrs",
+    },
+} satisfies Record<1 | 3, RuleProvider>;
 
 /** 所有合法的规则集名称。 */
 export type RuleSetKey = keyof typeof ruleSets;

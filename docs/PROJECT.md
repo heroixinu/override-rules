@@ -44,8 +44,10 @@ https://raw.githubusercontent.com/heroixinu/override-rules/refs/heads/preview/co
 | `ipv6` | 启用 IPv6 | `false` |
 | `full` | 生成完整 Mihomo 配置 | `false` |
 | `keepalive` | 启用 TCP Keep Alive | `false` |
-| `fakeip` | 使用 `fake-ip` DNS 增强模式 | `true` |
-| `quic` | 允许 UDP 443 / QUIC | `false` |
+| `fakeip` | 使用 `fake-ip` DNS 增强模式 | `false` |
+| `dnsipv6` | 独立允许 DNS AAAA 响应 | `false` |
+| `adblock` | 0=关闭，1=adrules.top，2=217heidai Lite，3=AWAvenue | `3` |
+| `quic` | 兼容旧参数，不全局阻断 UDP 443 | `false` |
 | `regex` | 国家/地区组使用 `include-all` + 正则动态筛选节点 | `false` |
 | `tun` | 启用 TUN 配置 | `false` |
 | `threshold` | 国家/地区节点数量低于该值时不生成对应分组 | `2` |
@@ -171,3 +173,6 @@ proxies:
 ## 上游
 
 本仓库基于 [powerfullz/override-rules](https://github.com/powerfullz/override-rules) 二次维护。感谢原项目及其依赖规则项目的工作。
+## 上游同步说明
+
+同步上游 2.10.2，保留本 Fork 的 Redir-host、独立 DNS IPv6 及自定义策略组。FCM 不再强制直连，改用常规分流；TUN MTU 为 9000。广告规则默认 AWAvenue，217heidai Lite 使用 dist 分支的 MRS 产物。各广告源使用独立缓存文件；静态 YAML 文件名新增 `adblock-N` 段。
