@@ -160,7 +160,7 @@ proxies:
 
 - `main`：源码分支，不保存自动生成产物。
 - `preview`：由 `main` 变更自动构建并强制更新，适合测试当前最新规则。
-- 正式版本：通过 `src-vX.Y.Z` 源码 Tag 触发 Release 工作流，并生成对应 GitHub Release 与版本产物。
+- 正式版本：`main` 的完整 CI 通过后，自动读取 `package.json` 的版本号。仅在该版本尚未发布且高于现有正式版本时发布 GitHub Release、更新 `dist` 与版本产物。无需手动创建或推送源码 Tag。
 
 本文档不依赖第三方 CDN 链接，避免文档链接与实际发布状态不一致。
 

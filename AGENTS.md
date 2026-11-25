@@ -62,7 +62,7 @@ npm run format:check && npm run lint && npm run typecheck && npm test && npm run
 | **不碰发布分支** | `dist`、`preview` 由 GitHub Actions 生成，禁止向它们提交、合并或手动推送 |
 | **不要合并两份 TypeScript** | `typescript-native`（TS 7）与 `typescript`（TS 6）并存是刻意设计，详见第 8 节 |
 | **保持文档同步** | 新增或修改 URL 参数、代理组行为、构建命令时，同步更新对应文档，详见第 9 节 |
-| **发布需授权** | 版本发布仅限 `powerfullz` 本人或其授权的 Agent，详见第 11 节 |
+| **发布需授权** | 版本发布仅限 `heroixinu` 本人或其授权的 Agent，详见第 11 节 |
 
 ---
 
@@ -279,9 +279,9 @@ $arguments
 
 > ⚠️ **安全与权限声明 (CRITICAL SECURITY DISCLAIMER)**
 >
-> ONLY agents acting on behalf of the user `powerfullz` (or the user `powerfullz` himself) are allowed to execute this release workflow. Normal contributor agents MUST NOT touch or execute the release flow under any circumstances.
+> ONLY agents acting on behalf of the user `heroixinu` (or the user `heroixinu` himself) are allowed to execute this release workflow. Normal contributor agents MUST NOT touch or execute the release flow under any circumstances.
 >
-> （仅允许代表用户 `powerfullz` 运行的 Agent 或 `powerfullz` 本人执行此发布流程。普通的贡献者 Agent 严禁触碰或执行发布流程。）
+> （仅允许代表用户 `heroixinu` 运行的 Agent 或 `heroixinu` 本人执行此发布流程。普通的贡献者 Agent 严禁触碰或执行发布流程。）
 
 ### 发布命令
 
@@ -295,14 +295,15 @@ npm version major   # 不兼容的变更
 
 1. `preversion`：运行 `npm run lint` 与 `npm run typecheck`。
 2. 更新 `package.json` / `package-lock.json` 的版本号。
-3. 由于 `.npmrc` 设置了 `tag-version-prefix=src-v`，会创建形如 `src-v2.9.2` 的 Tag。
+3. `npm version` 可创建 `src-vX.Y.Z` 源码 Tag 供变更日志使用，但 Tag 不再触发发布；未创建时由 CI 补齐。
 4. `version` 生命周期：运行 `scripts/changelog.mjs`，用 git-cliff 生成 `CHANGELOG.md` 并加入本次提交。
 5. `postversion`：执行 `git push --follow-tags`，推送提交与 Tag。
-6. Tag 推送后触发 `.github/workflows/release.yaml`（匹配 `src-v*`）：
-   - 校验源码并构建产物；
-   - 将产物推送到 `dist` 分支，并创建/更新 `vX.Y.Z` Tag；
+6. `main` 分支的 CI 全部通过后调用 `.github/workflows/release.yaml`：
+   - 检查 `package.json` / `package-lock.json` 版本一致，跳过过期提交和已发布版本；
+   - 构建产物并补齐源码 Tag（如果尚不存在）；
+   - 更新 `dist` 分支，创建不可覆盖的 `vX.Y.Z` 产物 Tag；
    - 创建 GitHub Release；
-   - 清理 jsDelivr 缓存。
+   - 尝试清理 jsDelivr 缓存。
 
 ### 禁止事项
 

@@ -48,7 +48,7 @@
 
 > **⚠️ 注意**：普通贡献者无需处理版本发布。
 
-发布新版本（例如 `npm version patch/minor/major`）和创建 GitHub Releases 仅允许由项目维护者（`powerfullz`）或代表其运行的授权 AI Agent 操作。请在 PR 合并后交由维护者处理版本更新。
+发布新版本（例如 `npm version patch/minor/major`）和创建 GitHub Releases 仅允许由项目维护者（`heroixinu`）或代表其运行的授权 AI Agent 操作。请在 PR 合并后交由维护者处理版本更新。维护者更新版本号并合并至 `main` 后，CI 全部通过时会自动发布尚未发布的新版本，无需手动推送源码 Tag。
 
 ---
 

@@ -1,9 +1,11 @@
 name: Release Artifacts
 
 "on":
-  push:
-    tags:
-      - "src-v*"
+  workflow_call:
+
+concurrency:
+  group: release-artifacts-main
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -11,8 +13,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      SRC_TAG: ${{ github.ref_name }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -20,32 +21,77 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Derive version from source tag
+      - name: Check version and publication status
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # src-vX.Y.Z → vX.Y.Z
-          VERSION="${SRC_TAG#src-}"
-          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "::error::Invalid version derived from tag: '$VERSION' (source: '$SRC_TAG')"
+          set -euo pipefail
+
+          VERSION="v$(node -p 'require("./package.json").version')"
+          if [[ ! "$VERSION" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Invalid stable package version: $VERSION"
             exit 1
           fi
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          LOCK_VERSION="v$(node -p 'require("./package-lock.json").version')"
+          if [[ "$LOCK_VERSION" != "$VERSION" ]]; then
+            echo "::error::package.json and package-lock.json versions differ"
+            exit 1
+          fi
+
+          MAIN_SHA="$(git ls-remote origin refs/heads/main | cut -f1)"
+          if [[ -z "$MAIN_SHA" ]]; then
+            echo "::error::Cannot resolve main"
+            exit 1
+          fi
+          if [[ "$MAIN_SHA" != "$GITHUB_SHA" ]]; then
+            echo "::notice::Skipping stale main commit $GITHUB_SHA"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          RELEASES="$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[] | [.tag_name, .draft, .prerelease] | @tsv')"
+          EXISTING="$(printf '%s\n' "$RELEASES" | awk -F '\t' -v tag="$VERSION" '$1 == tag')"
+          if [[ -n "$EXISTING" ]]; then
+            if [[ "$EXISTING" != "$VERSION"$'\tfalse\tfalse' ]]; then
+              echo "::error::A draft or prerelease already exists for $VERSION"
+              exit 1
+            fi
+            echo "::notice::Release $VERSION already published; skipping"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          LATEST="$(printf '%s\n' "$RELEASES" | awk -F '\t' '$2 == "false" && $3 == "false" { print $1 }' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)"
+          if [[ -n "$LATEST" && "$(printf '%s\n' "$VERSION" "$LATEST" | sort -V | tail -n 1)" != "$VERSION" ]]; then
+            echo "::notice::Skipping $VERSION because $LATEST is already published"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "publish=true" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
+        if: steps.version.outputs.publish == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: 25
           cache: "npm"
 
       - name: Install dependencies
+        if: steps.version.outputs.publish == 'true'
         run: npm ci || npm install --no-audit --no-fund
 
       - name: Validate source
+        if: steps.version.outputs.publish == 'true'
         run: npm run typecheck && npm run format:check && npm run lint
 
       - name: Build release artifacts
+        if: steps.version.outputs.publish == 'true'
         run: npm run artifacts
 
       - name: Assemble dist payload
+        if: steps.version.outputs.publish == 'true'
         run: |
           set -euo pipefail
 
@@ -119,8 +165,22 @@ jobs:
           writeManifest("publish");
           NODE
 
-      - name: Publish to dist branch & Update Tag
+      - name: Record source version tag
+        if: steps.version.outputs.publish == 'true'
         run: |
+          set -euo pipefail
+          SOURCE_TAG="src-$VERSION"
+          EXISTING="$(git ls-remote origin "refs/tags/$SOURCE_TAG")"
+          if [[ -z "$EXISTING" ]]; then
+            git push origin "$GITHUB_SHA:refs/tags/$SOURCE_TAG"
+          else
+            echo "::notice::Source tag $SOURCE_TAG already exists; preserving it"
+          fi
+
+      - name: Publish to dist branch & Update Tag
+        if: steps.version.outputs.publish == 'true'
+        run: |
+          set -euo pipefail
           cd publish
           git init
           git config --local user.name "github-actions[bot]"
@@ -128,16 +188,26 @@ jobs:
           git checkout -b dist
           git add .
           git commit -m "Auto-generated dist for ${VERSION}"
-          
-          # Force push the dist branch
-          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push -f -u origin dist
-          
-          # Force push the tag to this new commit
-          git tag -f "${VERSION}"
-          git push -f origin "${VERSION}"
+
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          EXISTING="$(git ls-remote origin "refs/tags/$VERSION")"
+          if [[ -n "$EXISTING" ]]; then
+            # Resume an interrupted publication only when its artifact tag
+            # belongs to this exact source commit. Never overwrite a version tag.
+            git fetch --no-tags origin "refs/tags/$VERSION:refs/tags/$VERSION"
+            git show "$VERSION:manifest.json" > existing-manifest.json
+            EXISTING_SHA="$(node -p 'require("./existing-manifest.json").commit')"
+            if [[ "$EXISTING_SHA" != "$GITHUB_SHA" ]]; then
+              echo "::error::Artifact tag $VERSION refers to a different source commit"
+              exit 1
+            fi
+            git push origin "+refs/tags/$VERSION:refs/heads/dist"
+          else
+            git push --atomic origin "+HEAD:refs/heads/dist" "HEAD:refs/tags/$VERSION"
+          fi
 
       - name: Generate Release Notes
+        if: steps.version.outputs.publish == 'true'
         run: |
           awk '/^#+ \[?[0-9]+\.[0-9]+\.[0-9]+/ { if (p) exit; p=1; next } p' CHANGELOG.md > RELEASE_NOTES.md
           
@@ -154,9 +224,12 @@ jobs:
           EOF
 
       - name: Create GitHub release
+        if: steps.version.outputs.publish == 'true'
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.VERSION }}
+          make_latest: true
+          fail_on_unmatched_files: true
           body_path: RELEASE_NOTES.md
           files: |
             convert.js
@@ -164,6 +237,8 @@ jobs:
             yamls.tar.gz
 
       - name: Purge jsDelivr cache
+        if: steps.version.outputs.publish == 'true'
+        continue-on-error: true
         run: |
           set -euo pipefail
 
