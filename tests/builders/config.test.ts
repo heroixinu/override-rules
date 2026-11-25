@@ -415,7 +415,10 @@ describe("assembleConfig", () => {
         const sources = ["1", "2", "3"].map((adblock) => run({ adblock }, CONFIG));
         const paths = sources.map((result) => result["rule-providers"]?.ADBlock?.path);
         assert.equal(new Set(paths).size, 3);
-        assert.deepEqual(defaults["rule-providers"]?.ADBlock, sources[2]["rule-providers"]?.ADBlock);
+        assert.deepEqual(
+            defaults["rule-providers"]?.ADBlock,
+            sources[2]["rule-providers"]?.ADBlock
+        );
     });
 
     it("adblock=3 时 ADBlock 指向 AWAvenue", () => {
