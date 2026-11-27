@@ -285,6 +285,8 @@ $arguments
 
 ### 发布命令
 
+Fork 自身修改无需执行 `npm version`：合并 `main` 且 CI 通过后自动使用 `vX.Y.Z.N` 发布，npm 版本保持上游 `X.Y.Z`。以下命令仅用于维护者确需修改三段基础版本的情况。
+
 ```bash
 npm version patch   # 向后兼容的修复
 npm version minor   # 向后兼容的新功能
@@ -299,7 +301,8 @@ npm version major   # 不兼容的变更
 4. `version` 生命周期：运行 `scripts/changelog.mjs`，用 git-cliff 生成 `CHANGELOG.md` 并加入本次提交。
 5. `postversion`：执行 `git push --follow-tags`，推送提交与 Tag。
 6. `main` 分支的 CI 全部通过后调用 `.github/workflows/release.yaml`：
-   - 检查 `package.json` / `package-lock.json` 版本一致，跳过过期提交和已发布版本；
+   - 检查 `package.json` / `package-lock.json` 上游三段版本一致，跳过过期提交和已发布的源提交；
+   - 同一上游版本的 Fork 更新自动递增第四段发布序号；同步新上游版本后恢复三段版本。
    - 构建产物并补齐源码 Tag（如果尚不存在）；
    - 更新 `dist` 分支，创建不可覆盖的 `vX.Y.Z` 产物 Tag；
    - 创建 GitHub Release；

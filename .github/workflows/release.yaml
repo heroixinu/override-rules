@@ -28,13 +28,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          VERSION="v$(node -p 'require("./package.json").version')"
-          if [[ ! "$VERSION" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
-            echo "::error::Invalid stable package version: $VERSION"
+          BASE_VERSION="v$(node -p 'require("./package.json").version')"
+          if [[ ! "$BASE_VERSION" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Invalid stable package version: $BASE_VERSION"
             exit 1
           fi
           LOCK_VERSION="v$(node -p 'require("./package-lock.json").version')"
-          if [[ "$LOCK_VERSION" != "$VERSION" ]]; then
+          if [[ "$LOCK_VERSION" != "$BASE_VERSION" ]]; then
             echo "::error::package.json and package-lock.json versions differ"
             exit 1
           fi
@@ -51,23 +51,65 @@ jobs:
           fi
 
           RELEASES="$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[] | [.tag_name, .draft, .prerelease] | @tsv')"
+          VERSION_PATTERN='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.[1-9][0-9]*)?$'
+          STABLE="$(printf '%s\n' "$RELEASES" | awk -F '\t' '$2 == "false" && $3 == "false" { print $1 }' | grep -E "$VERSION_PATTERN" || true)"
+          LATEST="$(printf '%s\n' "$STABLE" | sort -V | tail -n 1)"
+          if [[ -n "$LATEST" ]]; then
+            LATEST_BASE="$(cut -d. -f1-3 <<< "$LATEST")"
+            if [[ "$(printf '%s\n' "$BASE_VERSION" "$LATEST_BASE" | sort -V | tail -n 1)" != "$BASE_VERSION" ]]; then
+              echo "::notice::Skipping older upstream base $BASE_VERSION"
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          # Reuse the source reservation on retries; never publish the same commit twice.
+          CURRENT="$(git tag --points-at "$GITHUB_SHA" --list "src-$BASE_VERSION" "src-$BASE_VERSION.*" | sed 's/^src-//' | grep -E "$VERSION_PATTERN" | sort -V | tail -n 1 || true)"
+          # Artifact manifests are authoritative, including when an upstream
+          # source tag already existed at a different commit.
+          while IFS= read -r TAG; do
+            [[ "$TAG" == "$BASE_VERSION" || "$TAG" == "$BASE_VERSION".* ]] || continue
+            PUBLISHED_SHA="$(git show "$TAG:manifest.json" 2>/dev/null | node -e 'try { console.log(JSON.parse(require("fs").readFileSync(0, "utf8")).commit) } catch { process.exitCode = 1 }' || true)"
+            if [[ "$PUBLISHED_SHA" == "$GITHUB_SHA" ]]; then
+              echo "::notice::Release $TAG already published for this commit"
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done <<< "$STABLE"
+          if [[ -n "$CURRENT" ]] && grep -Fxq "$CURRENT" <<< "$STABLE"; then
+            CURRENT=""
+          fi
+
+          # Reserve all existing release and artifact/source tags, including interrupted releases.
+          RESERVED="$( { printf '%s\n' "$RELEASES" | cut -f1; git tag --list 'v*' 'src-v*' | sed 's/^src-//'; } | grep -E "$VERSION_PATTERN" | awk -v base="$BASE_VERSION" '$0 == base || index($0, base ".") == 1' | sort -V | tail -n 1 || true)"
+          if [[ -n "$CURRENT" && "$CURRENT" == "$RESERVED" ]]; then
+            VERSION="$CURRENT"
+          elif [[ -z "$RESERVED" ]]; then
+            VERSION="$BASE_VERSION"
+          elif [[ "$RESERVED" == "$BASE_VERSION" ]]; then
+            # An upstream source tag alone does not consume the first release.
+            if ! git show-ref --verify --quiet "refs/tags/$BASE_VERSION" && ! printf '%s\n' "$RELEASES" | cut -f1 | grep -Fxq "$BASE_VERSION"; then
+              VERSION="$BASE_VERSION"
+            else
+              VERSION="$BASE_VERSION.1"
+            fi
+          else
+            REVISION="${RESERVED##*.}"
+            VERSION="$BASE_VERSION.$((REVISION + 1))"
+          fi
+
           EXISTING="$(printf '%s\n' "$RELEASES" | awk -F '\t' -v tag="$VERSION" '$1 == tag')"
           if [[ -n "$EXISTING" ]]; then
-            if [[ "$EXISTING" != "$VERSION"$'\tfalse\tfalse' ]]; then
-              echo "::error::A draft or prerelease already exists for $VERSION"
-              exit 1
-            fi
-            echo "::notice::Release $VERSION already published; skipping"
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "::error::Release $VERSION already exists"
+            exit 1
           fi
-          LATEST="$(printf '%s\n' "$RELEASES" | awk -F '\t' '$2 == "false" && $3 == "false" { print $1 }' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)"
           if [[ -n "$LATEST" && "$(printf '%s\n' "$VERSION" "$LATEST" | sort -V | tail -n 1)" != "$VERSION" ]]; then
-            echo "::notice::Skipping $VERSION because $LATEST is already published"
+            echo "::notice::Skipping stale release version $VERSION"
             echo "publish=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          echo "PREVIOUS_VERSION=$LATEST" >> "$GITHUB_ENV"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "publish=true" >> "$GITHUB_OUTPUT"
 
@@ -174,6 +216,13 @@ jobs:
           if [[ -z "$EXISTING" ]]; then
             git push origin "$GITHUB_SHA:refs/tags/$SOURCE_TAG"
           else
+            if [[ "$VERSION" == v*.*.*.* ]]; then
+              TAG_SHA="$(git rev-parse "$SOURCE_TAG^{commit}")"
+              if [[ "$TAG_SHA" != "$GITHUB_SHA" ]]; then
+                echo "::error::Source tag $SOURCE_TAG belongs to another commit"
+                exit 1
+              fi
+            fi
             echo "::notice::Source tag $SOURCE_TAG already exists; preserving it"
           fi
 
@@ -209,7 +258,11 @@ jobs:
       - name: Generate Release Notes
         if: steps.version.outputs.publish == 'true'
         run: |
-          awk '/^#+ \[?[0-9]+\.[0-9]+\.[0-9]+/ { if (p) exit; p=1; next } p' CHANGELOG.md > RELEASE_NOTES.md
+          if [[ "$VERSION" == v*.*.*.* && -n "$PREVIOUS_VERSION" ]] && git rev-parse --verify "refs/tags/src-$PREVIOUS_VERSION" >/dev/null 2>&1; then
+            git log --format='- %s (%h)' "src-$PREVIOUS_VERSION..$GITHUB_SHA" > RELEASE_NOTES.md
+          else
+            awk '/^#+ \[?[0-9]+\.[0-9]+\.[0-9]+/ { if (p) exit; p=1; next } p' CHANGELOG.md > RELEASE_NOTES.md
+          fi
           
           cat >> RELEASE_NOTES.md << 'EOF'
           
@@ -217,10 +270,10 @@ jobs:
           
           构建产物已同步并放于根目录。
 
-          - JS 覆写 (最新版, 推荐)：`https://cdn.jsdelivr.net/gh/${{ github.repository }}/convert.min.js`
-          - JS 覆写 (当前版本)：`https://cdn.jsdelivr.net/gh/${{ github.repository }}@${{ env.VERSION }}/convert.min.js`
-          - YAML 索引 (最新版)：`https://cdn.jsdelivr.net/gh/${{ github.repository }}/manifest.json`
-          - YAML 索引 (当前版本)：`https://cdn.jsdelivr.net/gh/${{ github.repository }}@${{ env.VERSION }}/manifest.json`
+          - JS 覆写 (最新版, 推荐)：`https://cdn.jsdelivr.net/gh/${{ github.repository }}@dist/convert.min.js`
+          - JS 覆写 (当前版本)：`https://raw.githubusercontent.com/${{ github.repository }}/${{ env.VERSION }}/convert.min.js`
+          - YAML 索引 (最新版)：`https://cdn.jsdelivr.net/gh/${{ github.repository }}@dist/manifest.json`
+          - YAML 索引 (当前版本)：`https://raw.githubusercontent.com/${{ github.repository }}/${{ env.VERSION }}/manifest.json`
           EOF
 
       - name: Create GitHub release
@@ -243,4 +296,4 @@ jobs:
           set -euo pipefail
 
           curl -fsS "https://purge.jsdelivr.net/gh/${{ github.repository }}/convert.min.js"
-          curl -fsS "https://purge.jsdelivr.net/gh/${{ github.repository }}@${{ env.VERSION }}/convert.min.js"
+          curl -fsS "https://purge.jsdelivr.net/gh/${{ github.repository }}@dist/manifest.json"
