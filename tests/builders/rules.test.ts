@@ -35,6 +35,15 @@ describe("buildRules", () => {
         }
     });
 
+    it("谷歌中国优先于国内及通用谷歌规则，保留广告过滤优先级", () => {
+        const rules = buildRules({ quicEnabled: true, hasTailscale: false, adblockSource: 2 });
+        const index = rules.indexOf("GEOSITE,google@cn,谷歌中国");
+        assert.ok(index > rules.findIndex((rule) => rule.startsWith("RULE-SET,AdditionalFilter,")));
+        assert.ok(index < rules.indexOf("GEOSITE,cn,DIRECT"));
+        assert.ok(index < rules.findIndex((rule) => rule.startsWith("RULE-SET,StaticResources,")));
+        assert.ok(index < rules.indexOf("GEOSITE,google,谷歌服务"));
+    });
+
     it("以 MATCH 收尾", () => {
         const rules = buildRules({ quicEnabled: true, hasTailscale: false, adblockSource: 2 });
         assert.equal(rules.at(-1), "MATCH,Final");

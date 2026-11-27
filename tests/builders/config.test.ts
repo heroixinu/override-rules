@@ -236,6 +236,17 @@ describe("assembleConfig", () => {
         ]);
     });
 
+    it("谷歌中国默认直连且支持代理选择", () => {
+        const result = run({}, CONFIG);
+        const googleCN = group(result, PROXY_GROUPS.GOOGLE_CN);
+        assert.equal(googleCN?.type, "select");
+        assert.equal(googleCN?.proxies?.[0], "DIRECT");
+        assert.ok(googleCN?.proxies?.includes(PROXY_GROUPS.SELECT));
+        assert.deepEqual(group(run({}, { proxies: [] }), PROXY_GROUPS.GOOGLE_CN)?.proxies, [
+            "DIRECT",
+        ]);
+    });
+
     it("OpenCode 默认使用 DIRECT，且保留手动切换候选", () => {
         const result = run({}, CONFIG);
         const openCode = group(result, PROXY_GROUPS.OPENCODE);
