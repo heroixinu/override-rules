@@ -65,10 +65,19 @@ jobs:
 
           # Reuse the source reservation on retries; never publish the same commit twice.
           CURRENT="$(git tag --points-at "$GITHUB_SHA" --list "src-$BASE_VERSION" "src-$BASE_VERSION.*" | sed 's/^src-//' | grep -E "$VERSION_PATTERN" | sort -V | tail -n 1 || true)"
+          # Artifact manifests are authoritative, including when an upstream
+          # source tag already existed at a different commit.
+          while IFS= read -r TAG; do
+            [[ "$TAG" == "$BASE_VERSION" || "$TAG" == "$BASE_VERSION".* ]] || continue
+            PUBLISHED_SHA="$(git show "$TAG:manifest.json" 2>/dev/null | node -e 'try { console.log(JSON.parse(require("fs").readFileSync(0, "utf8")).commit) } catch { process.exitCode = 1 }' || true)"
+            if [[ "$PUBLISHED_SHA" == "$GITHUB_SHA" ]]; then
+              echo "::notice::Release $TAG already published for this commit"
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done <<< "$STABLE"
           if [[ -n "$CURRENT" ]] && grep -Fxq "$CURRENT" <<< "$STABLE"; then
-            echo "::notice::Release $CURRENT already published for this commit"
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            CURRENT=""
           fi
 
           # Reserve all existing release and artifact/source tags, including interrupted releases.
