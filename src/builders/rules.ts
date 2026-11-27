@@ -46,6 +46,7 @@ export function buildRules({
         ruleSet("Game", PROXY_GROUPS.GAME_SERVICE),
         `GEOSITE,apple@cn,DIRECT`,
         `GEOSITE,microsoft@cn,DIRECT`,
+        `GEOSITE,google@cn,${PROXY_GROUPS.GOOGLE_CN}`,
         `GEOSITE,cn,DIRECT`,
         ruleSet("StaticResources", PROXY_GROUPS.STATIC_RESOURCES),
         ruleSet("CDNResources", PROXY_GROUPS.STATIC_RESOURCES),

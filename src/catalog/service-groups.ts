@@ -105,6 +105,11 @@ export const serviceGroups: ServiceGroupDef[] = [
         proxies: (ctx) => ctx.lists.defaultProxies,
     },
     {
+        name: PROXY_GROUPS.GOOGLE_CN,
+        icon: ICONS.google,
+        proxies: (ctx) => ctx.lists.defaultProxiesDirect,
+    },
+    {
         name: PROXY_GROUPS.MICROSOFT,
         icon: ICONS.microsoft,
         proxies: (ctx) => ctx.lists.defaultProxies,

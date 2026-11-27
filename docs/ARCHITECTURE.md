@@ -216,3 +216,7 @@ This fork preserves dedicated service groups for OpenCode (DIRECT-first), VoWiFi
 ## 2.10.2 上游同步
 
 新增 `adblock` 参数，默认 3（AWAvenue）；DNS 保留独立 `dnsipv6` 和禁用 H3，同时继承上游 `listen` 与 `proxy-server-nameserver`。FCM 交由常规规则分流，TUN MTU 为 9000；217heidai Lite 改用 dist 分支的 MRS 文件，各广告源独立缓存。
+
+### 谷歌中国策略组
+
+`service-groups.ts` 使用 `defaultProxiesDirect` 生成「谷歌中国」组，`rules.ts` 在国内和静态资源规则之前匹配 `google@cn`，保留前置广告过滤规则的优先级。

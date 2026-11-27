@@ -176,3 +176,7 @@ proxies:
 ## 上游同步说明
 
 同步上游 2.10.2，保留本 Fork 的 Redir-host、独立 DNS IPv6 及自定义策略组。FCM 不再强制直连，改用常规分流；TUN MTU 为 9000。广告规则默认 AWAvenue，217heidai Lite 使用 dist 分支的 MRS 产物。各广告源使用独立缓存文件；静态 YAML 文件名新增 `adblock-N` 段。
+
+### 谷歌中国分流
+
+「谷歌中国」策略组匹配 `GEOSITE,google@cn`（包括 `dl.google.com`），默认 DIRECT，可手动选择代理节点或其他可用候选。广告过滤等前置规则仍优先，普通谷歌服务分流保持不变。

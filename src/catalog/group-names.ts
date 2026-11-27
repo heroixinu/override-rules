@@ -32,6 +32,7 @@ export const PROXY_GROUPS = {
     FINANCE: "金融服务",
     APPLE: "苹果服务",
     GOOGLE: "谷歌服务",
+    GOOGLE_CN: "谷歌中国",
     MICROSOFT: "微软服务",
     BILIBILI: "哔哩哔哩",
     XBOX: "Xbox",
